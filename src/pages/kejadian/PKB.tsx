@@ -1,0 +1,265 @@
+import {
+	RefreshCw,
+	AlertCircle,
+	ChevronLeft,
+	ChevronRight,
+	Pencil,
+	Trash2,
+	Plus,
+} from "lucide-react";
+import { usePKB } from "../../hooks/usePKB";
+import type { PKB as PKBType } from "../../types/PKB";
+
+const COLUMNS = [
+	{ key: "no", label: "#", align: "center" as const },
+	{ key: "id_pkb", label: "ID PKB", align: "left" as const },
+	{ key: "id_ib", label: "ID IB", align: "left" as const },
+	{ key: "id_kejadian", label: "ID Kejadian", align: "left" as const },
+	{ key: "id_staff", label: "Petugas", align: "left" as const },
+	{ key: "no_dokumen", label: "No Dokumen", align: "left" as const },
+	{ key: "hasil", label: "Hasil", align: "center" as const },
+	{ key: "keterangan", label: "Keterangan", align: "left" as const },
+	{ key: "created_at", label: "Tanggal", align: "left" as const },
+	{ key: "actions", label: "", align: "center" as const },
+];
+
+export default function PKB() {
+	const {
+		pkbList,
+		total,
+		page,
+		totalPages,
+		from,
+		to,
+		loading,
+		error,
+		refetch,
+		setPage,
+	} = usePKB();
+
+	const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+	const handleAdd = () => {
+		console.log("Add PKB");
+	};
+
+	const handleEdit = (pkb: PKBType) => {
+		console.log("Edit PKB", pkb);
+	};
+
+	const handleDelete = (pkb: PKBType) => {
+		console.log("Delete PKB", pkb);
+	};
+
+	return (
+		<div className="space-y-4">
+			<div>
+				<p className="text-xs text-gray-400">Home / Kejadian / PKB</p>
+				<h1 className="text-2xl font-bold text-gray-800 mt-0.5">
+					Daftar Pemeriksaan Kebuntingan (PKB)
+				</h1>
+			</div>
+
+			<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
+				<div className="flex items-center justify-between gap-3 flex-wrap">
+					<div className="flex items-center gap-3">
+						<button
+							onClick={refetch}
+							disabled={loading}
+							className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 disabled:opacity-40 transition-colors cursor-pointer">
+							<RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+						</button>
+					</div>
+
+					<button
+						onClick={handleAdd}
+						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+						<Plus size={15} />
+						Add PKB
+					</button>
+				</div>
+
+				{error && (
+					<div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+						<AlertCircle size={15} className="shrink-0" />
+						<span>{error}</span>
+					</div>
+				)}
+
+				<div className="overflow-x-auto rounded-lg border border-gray-200">
+					<table className="w-full text-sm border-collapse">
+						<thead>
+							<tr className="bg-gray-50">
+								{COLUMNS.map((col) => (
+									<th
+										key={col.key}
+										className={`text-xs font-semibold text-gray-500 uppercase tracking-wider py-3 px-4 whitespace-nowrap border-b border-gray-200 ${
+											col.align === "center" ? "text-center" : "text-left"
+										}`}>
+										{col.label}
+									</th>
+								))}
+							</tr>
+						</thead>
+
+						<tbody className="divide-y divide-gray-100">
+							{loading ? (
+								Array.from({ length: 5 }).map((_, i) => (
+									<tr key={i}>
+										{COLUMNS.map((col) => (
+											<td key={col.key} className="py-3.5 px-4">
+												<div className="h-3.5 bg-gray-100 rounded-md animate-pulse w-full max-w-24" />
+											</td>
+										))}
+									</tr>
+								))
+							) : pkbList.length === 0 ? (
+								<tr>
+									<td
+										colSpan={COLUMNS.length}
+										className="text-center text-gray-400 text-sm py-16">
+										Tidak ada data PKB
+									</td>
+								</tr>
+							) : (
+								pkbList.map((pkb: PKBType, index: number) => {
+									const isBerhasil = pkb.hasil?.toLowerCase().includes("berhasil");
+
+									return (
+										<tr
+											key={pkb.id_pkb}
+											className="group hover:bg-blue-50/40 transition-colors">
+											<td className="py-3.5 px-4 text-center text-gray-400 font-mono text-xs">
+												{from + index}
+											</td>
+
+											<td className="py-3.5 px-4 whitespace-nowrap">
+												<span className="font-semibold text-blue-600">{pkb.id_pkb}</span>
+											</td>
+
+											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
+												{pkb.id_ib}
+											</td>
+
+											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
+												{pkb.id_kejadian}
+											</td>
+
+											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
+												{pkb.id_staff}
+											</td>
+
+											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
+												{pkb.no_dokumen}
+											</td>
+
+											<td className="py-3.5 px-4 text-center">
+												<span
+													className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${
+														isBerhasil
+															? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+															: "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
+													}`}>
+													<span
+														className={`h-1.5 w-1.5 rounded-full ${
+															isBerhasil ? "bg-emerald-400" : "bg-orange-400"
+														}`}
+													/>
+													{pkb.hasil}
+												</span>
+											</td>
+
+											<td className="py-3.5 px-4 text-gray-700">
+												{pkb.keterangan ?? "—"}
+											</td>
+
+											<td className="py-3.5 px-4 whitespace-nowrap text-gray-500 text-xs">
+												{pkb.created_at}
+											</td>
+
+											<td className="py-3.5 px-4">
+												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+													<button
+														onClick={() => handleEdit(pkb)}
+														className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+														title="Edit">
+														<Pencil size={14} />
+													</button>
+													<button
+														onClick={() => handleDelete(pkb)}
+														className="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+														title="Delete">
+														<Trash2 size={14} />
+													</button>
+												</div>
+											</td>
+										</tr>
+									);
+								})
+							)}
+						</tbody>
+					</table>
+				</div>
+
+				<div className="flex items-center justify-between pt-2">
+					<p className="text-xs text-gray-400">
+						{loading
+							? "Memuat data..."
+							: `Showing ${from} to ${to} of ${total} results`}
+					</p>
+
+					<div className="flex items-center gap-1">
+						<PaginationBtn
+							onClick={() => setPage(page - 1)}
+							disabled={page <= 1 || loading}>
+							<ChevronLeft size={14} />
+						</PaginationBtn>
+
+						{pages.map((p) => (
+							<PaginationBtn
+								key={p}
+								onClick={() => setPage(p)}
+								disabled={loading}
+								active={p === page}>
+								{p}
+							</PaginationBtn>
+						))}
+
+						<PaginationBtn
+							onClick={() => setPage(page + 1)}
+							disabled={page >= totalPages || loading}>
+							<ChevronRight size={14} />
+						</PaginationBtn>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+interface PaginationBtnProps {
+	onClick: () => void;
+	disabled?: boolean;
+	active?: boolean;
+	children: React.ReactNode;
+}
+
+function PaginationBtn({
+	onClick,
+	disabled,
+	active,
+	children,
+}: PaginationBtnProps) {
+	return (
+		<button
+			onClick={onClick}
+			disabled={disabled}
+			className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+				active
+					? "bg-blue-600 text-white"
+					: "text-gray-500 hover:bg-gray-100 border border-gray-200"
+			}`}>
+			{children}
+		</button>
+	);
+}
