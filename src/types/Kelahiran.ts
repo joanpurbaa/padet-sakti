@@ -4,8 +4,9 @@ export interface Kelahiran {
 	jenis_kelamin: string;
 	id_kejadian: string;
 	id_staff: string;
-	id_ticket: string;
+	id_ticket: string | null;
 	keunggulan: string | null;
+	no_dokumen: string | null;
 	created_at: string;
 	updated_at: string | null;
 }
