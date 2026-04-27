@@ -9,11 +9,15 @@ import {
 	Pencil,
 	Trash2,
 	X,
+	Play,
+	CheckCircle2,
+	Loader2,
 } from "lucide-react";
 import { useTickets } from "../hooks/useTickets";
 import type { DisplayTicket } from "../types/Ticket";
 import TicketFormModal from "../components/TicketFormModal";
 import DeleteTicketModal from "../components/DeleteTicketModal";
+import { updateTicketStatus } from "../service/ticketService";
 
 const COLUMNS = [
 	{ key: "no", label: "#", align: "center" as const },
@@ -34,6 +38,7 @@ export default function Tickets() {
 	const [deletingTicket, setDeletingTicket] = useState<DisplayTicket | null>(
 		null,
 	);
+	const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 	const deferredSearch = useDeferredValue(search);
 
 	const {
@@ -75,6 +80,68 @@ export default function Tickets() {
 	const handleCloseDeleteModal = () => {
 		setShowDeleteModal(false);
 		setDeletingTicket(null);
+	};
+
+	const handleUpdateStatus = async (ticket: DisplayTicket) => {
+		const statusLower = ticket.status?.toLowerCase();
+		let newStatus = "";
+
+		if (statusLower === "pending") {
+			newStatus = "In Progress";
+		} else if (statusLower === "in progress") {
+			newStatus = "Resolved";
+		} else {
+			return;
+		}
+
+		setUpdatingStatusId(ticket.id_ticket);
+		try {
+			await updateTicketStatus(ticket.id_ticket, newStatus);
+			refetch();
+		} catch {
+			// silent fail
+		} finally {
+			setUpdatingStatusId(null);
+		}
+	};
+
+	const getStatusButton = (ticket: DisplayTicket) => {
+		const statusLower = ticket.status?.toLowerCase();
+		const isUpdating = updatingStatusId === ticket.id_ticket;
+
+		if (statusLower === "pending") {
+			return (
+				<button
+					onClick={() => handleUpdateStatus(ticket)}
+					disabled={isUpdating}
+					className="p-1.5 rounded-md text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer disabled:opacity-40"
+					title="Accept">
+					{isUpdating ? (
+						<Loader2 size={14} className="animate-spin" />
+					) : (
+						<Play size={14} />
+					)}
+				</button>
+			);
+		}
+
+		if (statusLower === "in progress") {
+			return (
+				<button
+					onClick={() => handleUpdateStatus(ticket)}
+					disabled={isUpdating}
+					className="p-1.5 rounded-md text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer disabled:opacity-40"
+					title="Done">
+					{isUpdating ? (
+						<Loader2 size={14} className="animate-spin" />
+					) : (
+						<CheckCircle2 size={14} />
+					)}
+				</button>
+			);
+		}
+
+		return null;
 	};
 
 	return (
@@ -176,7 +243,10 @@ export default function Tickets() {
 								</tr>
 							) : (
 								tickets.map((ticket: DisplayTicket, index: number) => {
-									const isPending = ticket.status?.toLowerCase() === "pending";
+									const statusLower = ticket.status?.toLowerCase();
+									const isPending = statusLower === "pending";
+									const isInProgress = statusLower === "in progress";
+									const isResolved = statusLower === "resolved";
 									const hasStatus = ticket.status !== null;
 
 									return (
@@ -234,22 +304,30 @@ export default function Tickets() {
 
 											<td className="py-3.5 px-4 text-center">
 												{hasStatus ? (
-													<div className="flex flex-col items-center gap-1.5">
+													<span
+														className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full
+															${
+																isPending
+																	? "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
+																	: isInProgress
+																		? "bg-blue-50 text-blue-600 ring-1 ring-blue-200"
+																		: isResolved
+																			? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+																			: "bg-gray-50 text-gray-600 ring-1 ring-gray-200"
+															}`}>
 														<span
-															className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full
-																${
-																	isPending
-																		? "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
-																		: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-																}`}>
-															<span
-																className={`h-1.5 w-1.5 rounded-full ${
-																	isPending ? "bg-orange-400" : "bg-emerald-400"
-																}`}
-															/>
-															{ticket.status}
-														</span>
-													</div>
+															className={`h-1.5 w-1.5 rounded-full ${
+																isPending
+																	? "bg-orange-400"
+																	: isInProgress
+																		? "bg-blue-400"
+																		: isResolved
+																			? "bg-emerald-400"
+																			: "bg-gray-400"
+															}`}
+														/>
+														{ticket.status}
+													</span>
 												) : (
 													<span className="text-gray-300 text-xs">—</span>
 												)}
@@ -257,6 +335,7 @@ export default function Tickets() {
 
 											<td className="py-3.5 px-4">
 												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+													{getStatusButton(ticket)}
 													<button
 														onClick={() => handleEdit(ticket)}
 														className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"

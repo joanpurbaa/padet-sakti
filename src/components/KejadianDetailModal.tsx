@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, Loader2 } from "lucide-react";
 import type {
 	KejadianFormPayload,
 	KejadianFormErrors,
-  KejadianFormModalProps,
+	KejadianFormModalProps,
 } from "../types/Kejadian";
 import { addKejadian, editKejadian } from "../service/kejadianService";
-import { getPeternak } from "../service/peternakService";
-import type { Peternak } from "../types/Peternak";
-import type { Betina } from "../types/Betina";
+import { searchPeternak, getPeternak } from "../service/peternakService";
+import { searchBetina } from "../service/betinaService";
+import type { BetinaSearchItem } from "../service/betinaService";
 import SearchableSelect from "./SearchableSelect";
-import { getBetina } from "../service/betinaService";
 
 const STATUS_OPTIONS = [
 	"Belum Ada Tindakan",
@@ -29,6 +28,11 @@ const EMPTY_FORM: KejadianFormPayload = {
 	tanggal: "",
 };
 
+interface PeternakOption {
+	value: string;
+	label: string;
+}
+
 export default function KejadianFormModal({
 	open,
 	onClose,
@@ -42,10 +46,15 @@ export default function KejadianFormModal({
 	const [generalError, setGeneralError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const [peternakList, setPeternakList] = useState<Peternak[]>([]);
+	const [peternakOptions, setPeternakOptions] = useState<PeternakOption[]>([]);
+	const [initialPeternakOptions, setInitialPeternakOptions] = useState<
+		PeternakOption[]
+	>([]);
 	const [peternakLoading, setPeternakLoading] = useState(false);
+	const peternakTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const peternakControllerRef = useRef<AbortController | null>(null);
 
-	const [betinaList, setBetinaList] = useState<Betina[]>([]);
+	const [betinaList, setBetinaList] = useState<BetinaSearchItem[]>([]);
 	const [betinaLoading, setBetinaLoading] = useState(false);
 
 	useEffect(() => {
@@ -57,7 +66,12 @@ export default function KejadianFormModal({
 		setPeternakLoading(true);
 		getPeternak({ page: 1 }, controller.signal)
 			.then((res) => {
-				setPeternakList(res.data.data);
+				const opts = res.data.data.map((p) => ({
+					value: p.id_peternak,
+					label: `${p.id_peternak} - ${p.nama}`,
+				}));
+				setInitialPeternakOptions(opts);
+				setPeternakOptions(opts);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -65,18 +79,6 @@ export default function KejadianFormModal({
 				}
 			})
 			.finally(() => setPeternakLoading(false));
-
-		setBetinaLoading(true);
-		getBetina({ page: 1 }, controller.signal)
-			.then((res) => {
-				setBetinaList(res.data.data);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					console.error("Failed to load betina:", err);
-				}
-			})
-			.finally(() => setBetinaLoading(false));
 
 		if (kejadian) {
 			setForm({
@@ -89,18 +91,80 @@ export default function KejadianFormModal({
 		} else {
 			setForm(EMPTY_FORM);
 		}
+		setBetinaList([]);
 		setErrors({});
 		setGeneralError(null);
 
-		return () => controller.abort();
+		return () => {
+			controller.abort();
+			peternakControllerRef.current?.abort();
+			if (peternakTimerRef.current) clearTimeout(peternakTimerRef.current);
+		};
 	}, [open, kejadian]);
+
+	const fetchBetinaByPeternak = useCallback((idPeternak: string) => {
+		if (!idPeternak.trim()) {
+			setBetinaList([]);
+			return;
+		}
+
+		const controller = new AbortController();
+		setBetinaLoading(true);
+
+		searchBetina(idPeternak, controller.signal)
+			.then((data) => {
+				setBetinaList(Array.isArray(data) ? data : []);
+			})
+			.catch((err) => {
+				if (err.name !== "AbortError") {
+					console.error("Failed to search betina:", err);
+				}
+			})
+			.finally(() => setBetinaLoading(false));
+	}, []);
+
+	useEffect(() => {
+		if (!open) return;
+		if (form.peternak) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			fetchBetinaByPeternak(form.peternak);
+		}
+	}, [open, form.peternak, fetchBetinaByPeternak]);
 
 	if (!open) return null;
 
-	const peternakOptions = peternakList.map((p) => ({
-		value: p.id_peternak,
-		label: `${p.id_peternak} - ${p.nama}`,
-	}));
+	const handlePeternakSearch = (query: string) => {
+		if (peternakTimerRef.current) clearTimeout(peternakTimerRef.current);
+
+		if (!query.trim()) {
+			setPeternakOptions(initialPeternakOptions);
+			return;
+		}
+
+		peternakTimerRef.current = setTimeout(() => {
+			peternakControllerRef.current?.abort();
+			const controller = new AbortController();
+			peternakControllerRef.current = controller;
+			setPeternakLoading(true);
+
+			searchPeternak({ q: query.trim() }, controller.signal)
+				.then((data) => {
+					const list = Array.isArray(data) ? data : [];
+					setPeternakOptions(
+						list.map((p) => ({
+							value: p.id_peternak,
+							label: `${p.id_peternak} - ${p.text ?? p.id_peternak}`,
+						})),
+					);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						console.error("Failed to search peternak:", err);
+					}
+				})
+				.finally(() => setPeternakLoading(false));
+		}, 300);
+	};
 
 	const betinaOptions = betinaList.map((b) => ({
 		value: b.ear_tag,
@@ -116,9 +180,16 @@ export default function KejadianFormModal({
 		setGeneralError(null);
 	};
 
-	const handleSelectChange = (name: string, value: string) => {
-		setForm((prev) => ({ ...prev, [name]: value }));
-		setErrors((prev) => ({ ...prev, [name]: undefined }));
+	const handlePeternakChange = (val: string) => {
+		setForm((prev) => ({ ...prev, peternak: val, betina: "" }));
+		setErrors((prev) => ({ ...prev, peternak: undefined, betina: undefined }));
+		setGeneralError(null);
+		setBetinaList([]);
+	};
+
+	const handleBetinaChange = (val: string) => {
+		setForm((prev) => ({ ...prev, betina: val }));
+		setErrors((prev) => ({ ...prev, betina: undefined }));
 		setGeneralError(null);
 	};
 
@@ -126,7 +197,6 @@ export default function KejadianFormModal({
 		const errs: KejadianFormErrors = {};
 		if (!form.peternak.trim()) errs.peternak = ["ID Peternak wajib dipilih"];
 		if (!form.betina.trim()) errs.betina = ["ID Betina wajib dipilih"];
-		if (!form.status.trim()) errs.status = ["Status wajib dipilih"];
 		setErrors(errs);
 		return Object.keys(errs).length === 0;
 	};
@@ -201,8 +271,9 @@ export default function KejadianFormModal({
 						<SearchableSelect
 							options={peternakOptions}
 							value={form.peternak}
-							onChange={(val) => handleSelectChange("peternak", val)}
-							placeholder="Cari Peternak..."
+							onChange={handlePeternakChange}
+							onSearchChange={handlePeternakSearch}
+							placeholder="Cari ID / Nama Peternak..."
 							loading={peternakLoading}
 							error={errors.peternak ? errors.peternak[0] : undefined}
 						/>
@@ -218,9 +289,12 @@ export default function KejadianFormModal({
 						<SearchableSelect
 							options={betinaOptions}
 							value={form.betina}
-							onChange={(val) => handleSelectChange("betina", val)}
-							placeholder="Cari Betina..."
+							onChange={handleBetinaChange}
+							placeholder={
+								form.peternak ? "Cari Betina..." : "Pilih peternak terlebih dahulu"
+							}
 							loading={betinaLoading}
+							disabled={!form.peternak}
 							error={errors.betina ? errors.betina[0] : undefined}
 						/>
 						{errors.betina && (
@@ -228,29 +302,31 @@ export default function KejadianFormModal({
 						)}
 					</div>
 
-					<div>
-						<label className="block text-sm font-medium text-gray-600 mb-1.5">
-							Status <span className="text-red-400">*</span>
-						</label>
-						<select
-							name="status"
-							value={form.status}
-							onChange={handleChange}
-							className={`w-full border rounded-lg px-4 py-2.5 text-sm text-gray-800 outline-none transition-colors cursor-pointer ${
-								errors.status
-									? "border-red-400 bg-red-50"
-									: "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
-							}`}>
-							{STATUS_OPTIONS.map((opt) => (
-								<option key={opt} value={opt}>
-									{opt}
-								</option>
-							))}
-						</select>
-						{errors.status && (
-							<p className="text-red-500 text-xs mt-1">{errors.status[0]}</p>
-						)}
-					</div>
+					{isEdit && (
+						<div>
+							<label className="block text-sm font-medium text-gray-600 mb-1.5">
+								Status <span className="text-red-400">*</span>
+							</label>
+							<select
+								name="status"
+								value={form.status}
+								onChange={handleChange}
+								className={`w-full border rounded-lg px-4 py-2.5 text-sm text-gray-800 outline-none transition-colors cursor-pointer ${
+									errors.status
+										? "border-red-400 bg-red-50"
+										: "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+								}`}>
+								{STATUS_OPTIONS.map((opt) => (
+									<option key={opt} value={opt}>
+										{opt}
+									</option>
+								))}
+							</select>
+							{errors.status && (
+								<p className="text-red-500 text-xs mt-1">{errors.status[0]}</p>
+							)}
+						</div>
+					)}
 
 					<div>
 						<label className="block text-sm font-medium text-gray-600 mb-1.5">

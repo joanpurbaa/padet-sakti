@@ -21,7 +21,7 @@ const COLUMNS = [
 	{ key: "id_pembuatan", label: "ID Pembuatan", align: "left" as const },
 	{ key: "jenis_straw", label: "Jenis Straw", align: "left" as const },
 	{ key: "asal_straw", label: "Asal Straw", align: "left" as const },
-	{ key: "persentase", label: "Persentase", align: "center" as const },
+	// { key: "persentase", label: "Persentase", align: "center" as const },
 	{ key: "created_at", label: "Tanggal", align: "left" as const },
 	{ key: "actions", label: "", align: "center" as const },
 ];
@@ -203,11 +203,11 @@ export default function Pejantan() {
 											{item.asal_straw}
 										</td>
 
-										<td className="py-3.5 px-4 text-center">
+										{/* <td className="py-3.5 px-4 text-center">
 											<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-200">
 												{item.persentase}%
 											</span>
-										</td>
+										</td> */}
 
 										<td className="py-3.5 px-4 whitespace-nowrap text-gray-500 text-xs">
 											{item.created_at}

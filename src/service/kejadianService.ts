@@ -84,3 +84,8 @@ export async function addInseminasi(
 		body: JSON.stringify(payload),
 	});
 }
+
+export function getPrintPdfUrl(idKejadian: string): string {
+	const base = import.meta.env.VITE_API_TARGET || "/proxy-api";
+	return `${base}/print_pdf/${idKejadian}`;
+}

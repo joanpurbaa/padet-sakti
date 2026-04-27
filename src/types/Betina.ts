@@ -37,3 +37,25 @@ export interface BetinaListResponse {
 export interface BetinaQueryParams {
 	page?: number;
 }
+
+// ===== TAMBAHAN BARU =====
+
+export interface BetinaFormPayload {
+	nama: string;
+	peternak: string;
+	jenis: string;
+	tanggal: string;
+}
+
+export interface BetinaFormErrors {
+	nama?: string;
+	peternak?: string;
+	jenis?: string;
+	tanggal?: string;
+}
+
+export interface BetinaFormModalProps {
+	open: boolean;
+	onClose: () => void;
+	onSuccess: () => void;
+}

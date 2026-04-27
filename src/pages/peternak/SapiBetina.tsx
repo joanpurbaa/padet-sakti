@@ -1,12 +1,15 @@
+import { useState } from "react";
 import {
 	RefreshCw,
 	AlertCircle,
 	ChevronLeft,
 	ChevronRight,
 	Image,
+	Plus,
 } from "lucide-react";
 import { useBetina } from "../../hooks/useBetina";
 import type { Betina } from "../../types/Betina";
+import BetinaFormModal from "../../components/BetinaFormModal";
 
 const COLUMNS = [
 	{ key: "no", label: "#", align: "center" as const },
@@ -26,6 +29,8 @@ const COLUMNS = [
 const BASE_IMAGE_URL = "https://test.dkpppkotabanjar.com/public/";
 
 export default function SapiBetina() {
+	const [showFormModal, setShowFormModal] = useState(false);
+
 	const {
 		betinaList,
 		total,
@@ -40,6 +45,14 @@ export default function SapiBetina() {
 	} = useBetina();
 
 	const paginationPages = buildPaginationPages(currentPage, lastPage);
+
+	const handleAdd = () => {
+		setShowFormModal(true);
+	};
+
+	const handleCloseFormModal = () => {
+		setShowFormModal(false);
+	};
 
 	return (
 		<div className="space-y-4">
@@ -60,6 +73,13 @@ export default function SapiBetina() {
 							<RefreshCw size={14} className={loading ? "animate-spin" : ""} />
 						</button>
 					</div>
+
+					<button
+						onClick={handleAdd}
+						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+						<Plus size={15} />
+						Add Betina
+					</button>
 				</div>
 
 				{error && (
@@ -228,6 +248,12 @@ export default function SapiBetina() {
 					</div>
 				</div>
 			</div>
+
+			<BetinaFormModal
+				open={showFormModal}
+				onClose={handleCloseFormModal}
+				onSuccess={refetch}
+			/>
 		</div>
 	);
 }
@@ -241,7 +267,6 @@ function buildPaginationPages(
 	}
 
 	const pages: (number | "...")[] = [];
-
 	pages.push(1);
 
 	if (current > 3) {

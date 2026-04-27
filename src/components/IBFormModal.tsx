@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Plus } from "lucide-react";
 import { addIB, editIB } from "../service/ibService";
 import { getStaff } from "../service/staffService";
-import { getTickets } from "../service/ticketService";
+import { searchTickets } from "../service/ticketService";
 import { getKejadian } from "../service/kejadianService";
 import { getPejantan } from "../service/pejantanService";
 import type { Staff } from "../types/Staff";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import type { Kejadian } from "../types/Kejadian";
 import type { Pejantan } from "../types/Pejantan";
 import type { IB } from "../types/Ib";
@@ -28,8 +28,6 @@ interface IBForm {
 	tanggal: string;
 	keterangan: string;
 }
-
-const STATUS_OPTIONS = ["Telah Dilakukan Tindakan", "IB Berhasil", "IB Gagal"];
 
 const EMPTY_FORM: IBForm = {
 	kejadian: "",
@@ -57,7 +55,7 @@ export default function IBFormModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	const [kejadianList, setKejadianList] = useState<Kejadian[]>([]);
@@ -83,18 +81,6 @@ export default function IBFormModal({
 				}
 			})
 			.finally(() => setStaffLoading(false));
-
-		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					console.error("Failed to load tickets:", err);
-				}
-			})
-			.finally(() => setTicketLoading(false));
 
 		setKejadianLoading(true);
 		getKejadian({ page: 1 }, controller.signal)
@@ -139,6 +125,30 @@ export default function IBFormModal({
 		return () => controller.abort();
 	}, [open, ib]);
 
+	useEffect(() => {
+		if (!open || !form.kejadian) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			setTicketList([]);
+			return;
+		}
+
+		const controller = new AbortController();
+		setTicketLoading(true);
+
+		searchTickets({ kejadian: form.kejadian, jenis: "IB" }, controller.signal)
+			.then((data) => {
+				setTicketList(Array.isArray(data) ? data : []);
+			})
+			.catch((err) => {
+				if (err.name !== "AbortError") {
+					console.error("Failed to load tickets:", err);
+				}
+			})
+			.finally(() => setTicketLoading(false));
+
+		return () => controller.abort();
+	}, [open, form.kejadian]);
+
 	if (!open) return null;
 
 	const kejadianOptions = kejadianList.map((k) => ({
@@ -148,7 +158,7 @@ export default function IBFormModal({
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama ?? t.id_peternak}`,
 	}));
 
 	const staffOptions = staffList.map((s) => ({
@@ -178,13 +188,18 @@ export default function IBFormModal({
 		setGeneralError(null);
 	};
 
+	const handleKejadianChange = (val: string) => {
+		setForm((prev) => ({ ...prev, kejadian: val, ticket: "" }));
+		setErrors((prev) => ({ ...prev, kejadian: "", ticket: "" }));
+		setGeneralError(null);
+	};
+
 	const validate = (): boolean => {
 		const errs: Record<string, string> = {};
 		if (!form.kejadian.trim()) errs.kejadian = "Kejadian wajib dipilih";
 		if (!form.staff.trim()) errs.staff = "Petugas wajib dipilih";
 		if (!form.ticket.trim()) errs.ticket = "Ticket wajib dipilih";
 		if (!form.pejantan.trim()) errs.pejantan = "Pejantan wajib dipilih";
-		if (!form.status.trim()) errs.status = "Status wajib dipilih";
 		if (!form.tanggal.trim()) errs.tanggal = "Tanggal wajib diisi";
 		setErrors(errs);
 		return Object.keys(errs).length === 0;
@@ -277,7 +292,7 @@ export default function IBFormModal({
 							<SearchableSelect
 								options={kejadianOptions}
 								value={form.kejadian}
-								onChange={(val) => handleSelectChange("kejadian", val)}
+								onChange={handleKejadianChange}
 								placeholder="Cari Kejadian..."
 								loading={kejadianLoading}
 								error={errors.kejadian}
@@ -290,8 +305,11 @@ export default function IBFormModal({
 							options={ticketOptions}
 							value={form.ticket}
 							onChange={(val) => handleSelectChange("ticket", val)}
-							placeholder="Cari Ticket..."
+							placeholder={
+								form.kejadian ? "Cari Ticket..." : "Pilih kejadian terlebih dahulu"
+							}
 							loading={ticketLoading}
+							disabled={!form.kejadian}
 							error={errors.ticket}
 						/>
 					</FormField>
@@ -316,20 +334,6 @@ export default function IBFormModal({
 							loading={pejantanLoading}
 							error={errors.pejantan}
 						/>
-					</FormField>
-
-					<FormField label="Status" required error={errors.status}>
-						<select
-							name="status"
-							value={form.status}
-							onChange={handleChange}
-							className={selectClass(errors.status)}>
-							{STATUS_OPTIONS.map((opt) => (
-								<option key={opt} value={opt}>
-									{opt}
-								</option>
-							))}
-						</select>
 					</FormField>
 
 					<FormField label="Keterangan" error={errors.keterangan}>
@@ -410,14 +414,6 @@ function FormField({
 
 function inputClass(error?: string) {
 	return `w-full border rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 outline-none transition-colors ${
-		error
-			? "border-red-400 bg-red-50"
-			: "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
-	}`;
-}
-
-function selectClass(error?: string) {
-	return `w-full border rounded-lg px-4 py-2.5 text-sm text-gray-800 outline-none transition-colors cursor-pointer ${
 		error
 			? "border-red-400 bg-red-50"
 			: "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"

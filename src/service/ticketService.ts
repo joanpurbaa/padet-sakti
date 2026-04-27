@@ -63,3 +63,13 @@ export async function editTicket(
 export async function deleteTicket(id: string): Promise<void> {
 	await apiFetch(`/ticket/${id}`, { method: "DELETE" });
 }
+
+export async function updateTicketStatus(
+	id: string,
+	status: string,
+): Promise<unknown> {
+	return apiFetch<unknown>("/update_status", {
+		method: "POST",
+		body: JSON.stringify({ id, status }),
+	});
+}

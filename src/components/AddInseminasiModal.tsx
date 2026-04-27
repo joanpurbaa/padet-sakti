@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Plus } from "lucide-react";
 import { addInseminasi } from "../service/kejadianService";
 import { getStaff } from "../service/staffService";
-import { getTickets } from "../service/ticketService";
+import { searchTickets } from "../service/ticketService";
 import { getPejantan } from "../service/pejantanService";
 import type { Staff } from "../types/Staff";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import type { Pejantan } from "../types/Pejantan";
 import SearchableSelect from "./SearchableSelect";
 import type { AddInseminasiModalProps, InseminasiForm } from "../types/Ib";
-
-const STATUS_OPTIONS = ["Telah Dilakukan Tindakan", "IB Berhasil", "IB Gagal"];
 
 const EMPTY_FORM: InseminasiForm = {
 	staff: "",
@@ -35,7 +33,7 @@ export default function AddInseminasiModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	const [pejantanList, setPejantanList] = useState<Pejantan[]>([]);
@@ -60,9 +58,9 @@ export default function AddInseminasiModal({
 			.finally(() => setStaffLoading(false));
 
 		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
+		searchTickets({ kejadian: idKejadian, jenis: "IB" }, controller.signal)
+			.then((data) => {
+				setTicketList(Array.isArray(data) ? data : []);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -88,7 +86,7 @@ export default function AddInseminasiModal({
 		setGeneralError(null);
 
 		return () => controller.abort();
-	}, [open]);
+	}, [open, idKejadian]);
 
 	if (!open) return null;
 
@@ -99,7 +97,7 @@ export default function AddInseminasiModal({
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama ?? t.id_peternak}`,
 	}));
 
 	const pejantanOptions = pejantanList.map((p) => ({
@@ -129,7 +127,6 @@ export default function AddInseminasiModal({
 		if (!form.staff.trim()) errs.staff = "Petugas wajib dipilih";
 		if (!form.ticket.trim()) errs.ticket = "Ticket wajib dipilih";
 		if (!form.pejantan.trim()) errs.pejantan = "Pejantan wajib dipilih";
-		if (!form.status.trim()) errs.status = "Status wajib dipilih";
 		if (!form.tanggal.trim()) errs.tanggal = "Tanggal wajib diisi";
 		setErrors(errs);
 		return Object.keys(errs).length === 0;
@@ -243,20 +240,6 @@ export default function AddInseminasiModal({
 						/>
 					</FormField>
 
-					<FormField label="Status" required error={errors.status}>
-						<select
-							name="status"
-							value={form.status}
-							onChange={handleChange}
-							className={selectClass(errors.status)}>
-							{STATUS_OPTIONS.map((opt) => (
-								<option key={opt} value={opt}>
-									{opt}
-								</option>
-							))}
-						</select>
-					</FormField>
-
 					<FormField label="Keterangan" error={errors.keterangan}>
 						<textarea
 							name="keterangan"
@@ -333,14 +316,6 @@ function FormField({
 
 function inputClass(error?: string) {
 	return `w-full border rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 outline-none transition-colors ${
-		error
-			? "border-red-400 bg-red-50"
-			: "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
-	}`;
-}
-
-function selectClass(error?: string) {
-	return `w-full border rounded-lg px-4 py-2.5 text-sm text-gray-800 outline-none transition-colors cursor-pointer ${
 		error
 			? "border-red-400 bg-red-50"
 			: "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"

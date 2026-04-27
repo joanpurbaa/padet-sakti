@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown, X } from "lucide-react";
 import type { SearchableSelectProps } from "../types/SearchSelect";
 
-
 export default function SearchableSelect({
 	options,
 	value,
@@ -11,6 +10,7 @@ export default function SearchableSelect({
 	error,
 	loading,
 	disabled,
+	onSearchChange,
 }: SearchableSelectProps) {
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
@@ -19,11 +19,13 @@ export default function SearchableSelect({
 
 	const selected = options.find((o) => o.value === value);
 
-	const filtered = options.filter(
-		(o) =>
-			o.label.toLowerCase().includes(search.toLowerCase()) ||
-			o.value.toLowerCase().includes(search.toLowerCase()),
-	);
+	const filtered = onSearchChange
+		? options
+		: options.filter(
+				(o) =>
+					o.label.toLowerCase().includes(search.toLowerCase()) ||
+					o.value.toLowerCase().includes(search.toLowerCase()),
+			);
 
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
@@ -41,6 +43,12 @@ export default function SearchableSelect({
 			inputRef.current.focus();
 		}
 	}, [open]);
+
+	const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		setSearch(val);
+		onSearchChange?.(val);
+	};
 
 	const handleSelect = (val: string) => {
 		onChange(val);
@@ -92,7 +100,7 @@ export default function SearchableSelect({
 							ref={inputRef}
 							type="text"
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={handleSearchInput}
 							placeholder="Cari..."
 							className="w-full text-sm px-3 py-2 border border-gray-200 rounded-md outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors"
 						/>
@@ -100,7 +108,7 @@ export default function SearchableSelect({
 					<div className="max-h-48 overflow-y-auto">
 						{filtered.length === 0 ? (
 							<div className="px-4 py-3 text-sm text-gray-400 text-center">
-								Tidak ditemukan
+								{loading ? "Mencari..." : "Tidak ditemukan"}
 							</div>
 						) : (
 							filtered.map((opt) => (

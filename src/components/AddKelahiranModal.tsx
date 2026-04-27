@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Plus } from "lucide-react";
 import { addKelahiran } from "../service/kelahiranService";
 import { getStaff } from "../service/staffService";
-import { getTickets } from "../service/ticketService";
+import { searchTickets } from "../service/ticketService";
 import type { Staff } from "../types/Staff";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import SearchableSelect from "./SearchableSelect";
 import type { AddKelahiranModalProps, KelahiranForm } from "../types/Kelahiran";
 
@@ -33,7 +33,7 @@ export default function AddKelahiranModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	useEffect(() => {
@@ -55,9 +55,10 @@ export default function AddKelahiranModal({
 			.finally(() => setStaffLoading(false));
 
 		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
+		searchTickets({ kejadian: idKejadian, jenis: "Kelahiran" }, controller.signal)
+			.then((data) => {
+				const list = Array.isArray(data) ? data : [];
+				setTicketList(list);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -71,7 +72,7 @@ export default function AddKelahiranModal({
 		setGeneralError(null);
 
 		return () => controller.abort();
-	}, [open]);
+	}, [open, idKejadian]);
 
 	if (!open) return null;
 
@@ -82,7 +83,7 @@ export default function AddKelahiranModal({
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama}`,
 	}));
 
 	const handleChange = (

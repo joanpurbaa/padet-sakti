@@ -4,12 +4,13 @@ import {
 	ArrowLeft,
 	RefreshCw,
 	AlertCircle,
-	Printer,
+	FileText,
 	Plus,
 	Pencil,
 	Trash2,
 } from "lucide-react";
 import { useKejadianDetail } from "../hooks/useKejadianDetail";
+import { getPrintPdfUrl } from "../service/kejadianService";
 import type {
 	KejadianDetailIB,
 	KejadianDetailKelahiran,
@@ -112,6 +113,13 @@ export default function KejadianDetail() {
 		setDeletingKelahiran(null);
 	};
 
+	const handlePrintPdf = () => {
+		if (!id) return;
+		const token = localStorage.getItem("token");
+		const url = getPrintPdfUrl(id);
+		window.open(`${url}?token=${token}`, "_blank");
+	};
+
 	if (loading) {
 		return (
 			<div className="space-y-4">
@@ -193,10 +201,10 @@ export default function KejadianDetail() {
 						Kembali
 					</button>
 					<button
-						onClick={() => window.print()}
+						onClick={handlePrintPdf}
 						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
-						<Printer size={14} />
-						Print to PDF
+						<FileText size={14} />
+						Print PDF
 					</button>
 				</div>
 			</div>
