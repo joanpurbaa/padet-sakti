@@ -38,9 +38,8 @@ export interface BetinaQueryParams {
 	page?: number;
 }
 
-// ===== TAMBAHAN BARU =====
-
 export interface BetinaFormPayload {
+	eartag: string;
 	nama: string;
 	peternak: string;
 	jenis: string;
@@ -48,6 +47,7 @@ export interface BetinaFormPayload {
 }
 
 export interface BetinaFormErrors {
+	ear_tag?: string;
 	nama?: string;
 	peternak?: string;
 	jenis?: string;

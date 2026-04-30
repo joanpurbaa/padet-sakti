@@ -11,6 +11,7 @@ import type { Peternak } from "../types/Peternak";
 import SearchableSelect from "./SearchableSelect";
 
 const EMPTY_FORM: BetinaFormPayload = {
+	eartag: "",
 	nama: "",
 	peternak: "",
 	jenis: "",
@@ -77,6 +78,7 @@ export default function BetinaFormModal({
 
 	const validate = (): boolean => {
 		const errs: BetinaFormErrors = {};
+		if (!form.eartag.trim()) errs.ear_tag = "Ear Tag wajib diisi";
 		if (!form.nama.trim()) errs.nama = "Nama betina wajib diisi";
 		if (!form.peternak.trim()) errs.peternak = "Peternak wajib dipilih";
 		if (!form.jenis.trim()) errs.jenis = "Jenis sapi wajib diisi";
@@ -139,6 +141,17 @@ export default function BetinaFormModal({
 							{generalError}
 						</div>
 					)}
+
+					<FormField label="Ear Tag" required error={errors.ear_tag}>
+						<input
+							type="text"
+							name="eartag"
+							value={form.eartag}
+							onChange={handleChange}
+							placeholder="Contoh: ET-001"
+							className={inputClass(errors.ear_tag)}
+						/>
+					</FormField>
 
 					<FormField label="Nama" required error={errors.nama}>
 						<input

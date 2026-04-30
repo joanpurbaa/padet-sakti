@@ -33,8 +33,6 @@ export const searchBetina = async (
 	});
 };
 
-// ===== TAMBAHAN BARU =====
-
 export async function addBetina(payload: BetinaFormPayload): Promise<unknown> {
 	return apiFetch<unknown>("/add_betina", {
 		method: "POST",
