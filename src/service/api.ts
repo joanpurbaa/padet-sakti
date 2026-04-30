@@ -1,4 +1,4 @@
-const BASE_URL = "/proxy-api";
+const BASE_URL = import.meta.env.VITE_API_TARGET;
 
 export async function apiFetch<T>(
 	endpoint: string,
