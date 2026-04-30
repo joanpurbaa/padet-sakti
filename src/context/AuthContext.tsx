@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import type { User, AuthState } from "../types/Auth";
 
 interface AuthContextType extends AuthState {
+	isLoading: boolean;
 	login: (token: string, user: User) => void;
 	logout: () => void;
 }
@@ -14,6 +15,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		token: null,
 		isAuthenticated: false,
 	});
+
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -29,6 +32,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				localStorage.removeItem("user");
 			}
 		}
+
+		setIsLoading(false);
 	}, []);
 
 	const login = (token: string, user: User) => {
@@ -44,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	return (
-		<AuthContext.Provider value={{ ...auth, login, logout }}>
+		<AuthContext.Provider value={{ ...auth, isLoading, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

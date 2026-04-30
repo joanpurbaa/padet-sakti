@@ -50,6 +50,8 @@ export function useTickets(options?: UseTicketsOptions) {
 	const abortRef = useRef<AbortController | null>(null);
 	const isSearching = search.trim().length > 0;
 
+  const limit = options?.limit;
+
 	const fetchTickets = useCallback(async () => {
 		abortRef.current?.abort();
 		const controller = new AbortController();
@@ -70,7 +72,7 @@ export function useTickets(options?: UseTicketsOptions) {
 				setFrom(data.length > 0 ? 1 : 0);
 				setTo(data.length);
 			} else {
-				const res = await getTickets({ page: currentPage }, controller.signal);
+				const res = await getTickets({ page: currentPage, limit }, controller.signal);
 
 				const pagination = res.data;
 				setTickets(pagination.data.map(mapTicketToDisplay));
@@ -86,7 +88,7 @@ export function useTickets(options?: UseTicketsOptions) {
 		} finally {
 			setLoading(false);
 		}
-	}, [currentPage, isSearching, search]);
+	}, [currentPage, isSearching, limit, search]);
 
 	useEffect(() => {
 		// eslint-disable-next-line react-hooks/set-state-in-effect

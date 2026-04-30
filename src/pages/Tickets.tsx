@@ -41,6 +41,8 @@ export default function Tickets() {
 	const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 	const deferredSearch = useDeferredValue(search);
 
+	const [limit, setLimit] = useState(10);
+
 	const {
 		tickets,
 		total,
@@ -53,9 +55,9 @@ export default function Tickets() {
 		refetch,
 		setPage,
 		isSearching,
-	} = useTickets({ search: deferredSearch });
+	} = useTickets({ search: deferredSearch, limit });
 
-	const pages = Array.from({ length: lastPage }, (_, i) => i + 1);
+	const pagination = getPaginationRange(currentPage, lastPage);
 
 	const handleAdd = () => {
 		setEditingTicket(null);
@@ -170,6 +172,24 @@ export default function Tickets() {
 									<X size={14} />
 								</button>
 							)}
+						</div>
+
+						<div className="flex items-center gap-2 text-sm text-gray-500">
+							<select
+								value={limit}
+								onChange={(e) => {
+									setPage(1);
+									setLimit(Number(e.target.value));
+								}}
+								className="border border-gray-200 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+								{[5, 10, 25, 50, 100].map((num) => (
+									<option key={num} value={num}>
+										{num}
+									</option>
+								))}
+							</select>
+
+							<span>entries</span>
 						</div>
 
 						<button
@@ -375,15 +395,21 @@ export default function Tickets() {
 								<ChevronLeft size={14} />
 							</PaginationBtn>
 
-							{pages.map((page) => (
-								<PaginationBtn
-									key={page}
-									onClick={() => setPage(page)}
-									disabled={loading}
-									active={page === currentPage}>
-									{page}
-								</PaginationBtn>
-							))}
+							{pagination.map((item, index) =>
+								item === "..." ? (
+									<span key={`dots-${index}`} className="px-2 text-gray-400">
+										...
+									</span>
+								) : (
+									<PaginationBtn
+										key={`page-${item}-${index}`}
+										onClick={() => setPage(item as number)}
+										disabled={loading}
+										active={item === currentPage}>
+										{item}
+									</PaginationBtn>
+								),
+							)}
 
 							<PaginationBtn
 								onClick={() => setPage(currentPage + 1)}
@@ -417,6 +443,34 @@ interface PaginationBtnProps {
 	disabled?: boolean;
 	active?: boolean;
 	children: React.ReactNode;
+}
+
+function getPaginationRange(current: number, total: number) {
+	const delta = 1;
+	const result: (number | string)[] = [];
+
+	const left = Math.max(2, current - delta);
+	const right = Math.min(total - 1, current + delta);
+
+	result.push(1);
+
+	if (left > 2) {
+		result.push("...");
+	}
+
+	for (let i = left; i <= right; i++) {
+		result.push(i);
+	}
+
+	if (right < total - 1) {
+		result.push("...");
+	}
+
+	if (total > 1) {
+		result.push(total);
+	}
+
+	return result;
 }
 
 function PaginationBtn({
