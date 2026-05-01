@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, Loader2 } from "lucide-react";
 import { addTicket, editTicket } from "../service/ticketService";
 import { getStaff } from "../service/staffService";
-import { getPeternak,searchPeternak } from "../service/peternakService";
+import { searchPeternak } from "../service/peternakService";
 import type { Staff } from "../types/Staff";
 // import type { Peternak } from "../types/Peternak";
 import type { TicketFormPayload, TicketFormErrors, TicketModalProps } from "../types/Ticket";
@@ -39,7 +39,7 @@ export default function TicketFormModal({
 	const [staffLoading, setStaffLoading] = useState(false);
 
 	const [peternakOptions, setPeternakOptions] = useState<PeternakOption[]>([]);
-		const [initialPeternakOptions, setInitialPeternakOptions] = useState<
+		const [initialPeternakOptions] = useState<
 			PeternakOption[]
 		>([]);
 		const [peternakLoading, setPeternakLoading] = useState(false);

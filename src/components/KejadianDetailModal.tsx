@@ -6,7 +6,7 @@ import type {
 	KejadianFormModalProps,
 } from "../types/Kejadian";
 import { addKejadian, editKejadian } from "../service/kejadianService";
-import { searchPeternak, getPeternak } from "../service/peternakService";
+import { searchPeternak } from "../service/peternakService";
 import { searchBetina } from "../service/betinaService";
 import type { BetinaSearchItem } from "../service/betinaService";
 import SearchableSelect from "./SearchableSelect";
@@ -47,7 +47,7 @@ export default function KejadianFormModal({
 	const [loading, setLoading] = useState(false);
 
 	const [peternakOptions, setPeternakOptions] = useState<PeternakOption[]>([]);
-	const [initialPeternakOptions, setInitialPeternakOptions] = useState<
+	const [initialPeternakOptions] = useState<
 		PeternakOption[]
 	>([]);
 	const [peternakLoading, setPeternakLoading] = useState(false);

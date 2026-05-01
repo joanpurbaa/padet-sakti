@@ -116,11 +116,11 @@ export default function BetinaFormModal({
 		setGeneralError(null);
 	};
 
-	const handleSelectChange = (name: string, value: string) => {
-		setForm((prev) => ({ ...prev, [name]: value }));
-		setErrors((prev) => ({ ...prev, [name]: undefined }));
-		setGeneralError(null);
-	};
+	// const handleSelectChange = (name: string, value: string) => {
+	// 	setForm((prev) => ({ ...prev, [name]: value }));
+	// 	setErrors((prev) => ({ ...prev, [name]: undefined }));
+	// 	setGeneralError(null);
+	// };
 
 	const handlePeternakChange = (val: string) => {
 		setForm((prev) => ({ ...prev, peternak: val, betina: "" }));

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { editIB } from "../service/ibService";
 import { getStaff } from "../service/staffService";
-import { getTickets } from "../service/ticketService";
+// import { getTickets } from "../service/ticketService";
 import { searchTickets } from "../service/ticketService";
 import { getPejantan } from "../service/pejantanService";
 import type { Staff } from "../types/Staff";

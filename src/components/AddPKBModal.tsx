@@ -29,7 +29,6 @@ export default function AddPKBModal({
 	onClose,
 	onSuccess,
 	idKejadian,
-	pkb,
 }: AddPKBModalProps) {
 	// const isEdit = !!pkb;
 	const [form, setForm] = useState<PKBForm>(EMPTY_FORM);
@@ -89,24 +88,24 @@ export default function AddPKBModal({
 			})
 			.finally(() => setIbLoading(false));
 
-		if (pkb) {
-			setForm({
-				kejadian: pkb.id_kejadian ?? "",
-				ib: pkb.id_ib ?? "",
-				staff: pkb.id_staff ?? "",
-				ticket: pkb.id_ticket ?? "",
-				status: pkb.hasil ?? "Telah Dilakukan Tindakan",
-				tanggal: pkb.created_at ? pkb.created_at.split(" ")[0] : "",
-				keterangan: pkb.keterangan ?? "",
-			});
-		} else {
+		// if (pkb) {
+		// 	setForm({
+		// 		kejadian: pkb.id_kejadian ?? "",
+		// 		ib: pkb.id_ib ?? "",
+		// 		staff: pkb.id_staff ?? "",
+		// 		ticket: pkb.id_ticket ?? "",
+		// 		status: pkb.hasil ?? "Telah Dilakukan Tindakan",
+		// 		tanggal: pkb.created_at ? pkb.created_at.split(" ")[0] : "",
+		// 		keterangan: pkb.keterangan ?? "",
+		// 	});
+		// } else {
 			setForm(EMPTY_FORM);
-		}
+		// }
 		setErrors({});
 		setGeneralError(null);
 
 		return () => controller.abort();
-	}, [open, pkb]);
+	}, [open]);
 	useEffect(() => {
 			if (!open || !form.kejadian) {
 				// eslint-disable-next-line react-hooks/set-state-in-effect

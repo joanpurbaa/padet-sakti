@@ -3,7 +3,7 @@ export interface PKB {
 	id_ib: string;
 	id_kejadian: string;
 	id_ticket: string;
-	// no_dokumen: string;
+	no_dokumen: string;
 	id_staff: string;
 	hasil: string;
 	keterangan: string;
@@ -66,7 +66,6 @@ export interface AddPKBModalProps {
 	onClose: () => void;
 	onSuccess: () => void;
 	idKejadian: string;
-	pkb: PKB | null;
 }
 
 export interface PKBForm {

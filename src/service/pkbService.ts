@@ -1,7 +1,6 @@
 import type {
 	PKBFormPayload,
 	PKBListResponse,
-	PKB,
 	PKBQueryParams,
 	PKBResponse,
 } from "../types/PKB";
