@@ -10,7 +10,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import { useKejadianDetail } from "../hooks/useKejadianDetail";
-import { getPrintPdfUrl } from "../service/kejadianService";
+import { printPdf } from "../service/kejadianService";
 import type {
 	KejadianDetailIB,
 	KejadianDetailKelahiran,
@@ -113,12 +113,6 @@ export default function KejadianDetail() {
 		setDeletingKelahiran(null);
 	};
 
-	const handlePrintPdf = () => {
-		if (!id) return;
-		const token = localStorage.getItem("token");
-		const url = getPrintPdfUrl(id);
-		window.open(`${url}?token=${token}`, "_blank");
-	};
 
 	if (loading) {
 		return (
@@ -201,7 +195,7 @@ export default function KejadianDetail() {
 						Kembali
 					</button>
 					<button
-						onClick={handlePrintPdf}
+						onClick={() => printPdf(kejadian.id_kejadian)}
 						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
 						<FileText size={14} />
 						Print PDF

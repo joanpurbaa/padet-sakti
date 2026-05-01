@@ -11,14 +11,14 @@ import { searchBetina } from "../service/betinaService";
 import type { BetinaSearchItem } from "../service/betinaService";
 import SearchableSelect from "./SearchableSelect";
 
-const STATUS_OPTIONS = [
-	"Belum Ada Tindakan",
-	"BOLEH IB",
-	"Sedang Proses IB",
-	"Kelahiran Pada IB ke-1",
-	"Kelahiran Pada IB ke-2",
-	"Kelahiran Pada IB ke-3",
-];
+// const STATUS_OPTIONS = [
+// 	"Belum Ada Tindakan",
+// 	"BOLEH IB",
+// 	"Sedang Proses IB",
+// 	"Kelahiran Pada IB ke-1",
+// 	"Kelahiran Pada IB ke-2",
+// 	"Kelahiran Pada IB ke-3",
+// ];
 
 const EMPTY_FORM: KejadianFormPayload = {
 	betina: "",
@@ -302,7 +302,7 @@ export default function KejadianFormModal({
 						)}
 					</div>
 
-					{isEdit && (
+					{/* {isEdit && (
 						<div>
 							<label className="block text-sm font-medium text-gray-600 mb-1.5">
 								Status <span className="text-red-400">*</span>
@@ -326,7 +326,7 @@ export default function KejadianFormModal({
 								<p className="text-red-500 text-xs mt-1">{errors.status[0]}</p>
 							)}
 						</div>
-					)}
+					)} */}
 
 					<div>
 						<label className="block text-sm font-medium text-gray-600 mb-1.5">

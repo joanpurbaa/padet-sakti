@@ -40,7 +40,6 @@ export interface PKBFormPayload {
 	kejadian: string;
 	ib: string;
 	ticket: string;
-	dokumen: string;
 	staff: string;
 	status: string;
 	tanggal: string;
@@ -51,7 +50,6 @@ export interface PKBFormErrors {
 	kejadian?: string;
 	ib?: string;
 	ticket?: string;
-	dokumen?: string;
 	staff?: string;
 	status?: string;
 	tanggal?: string;
@@ -68,12 +66,13 @@ export interface AddPKBModalProps {
 	onClose: () => void;
 	onSuccess: () => void;
 	idKejadian: string;
+	pkb: PKB | null;
 }
 
 export interface PKBForm {
 	ib: string;
+	kejadian : string;
 	ticket: string;
-	dokumen: string;
 	staff: string;
 	status: string;
 	tanggal: string;

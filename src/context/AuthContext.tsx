@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import type { User, AuthState } from "../types/Auth";
 
 interface AuthContextType extends AuthState {
+	isLoading: boolean;
 	login: (token: string, user: User) => void;
 	logout: () => void;
 }
@@ -15,6 +16,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		isAuthenticated: false,
 	});
 
+	const [isLoading, setIsLoading] = useState(true);
+
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const userRaw = localStorage.getItem("user");
@@ -22,13 +25,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		if (token && userRaw) {
 			try {
 				const user = JSON.parse(userRaw) as User;
-				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setAuth({ token, user, isAuthenticated: true });
 			} catch {
 				localStorage.removeItem("token");
 				localStorage.removeItem("user");
 			}
 		}
+
+		setIsLoading(false);
 	}, []);
 
 	const login = (token: string, user: User) => {
@@ -44,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	return (
-		<AuthContext.Provider value={{ ...auth, login, logout }}>
+		<AuthContext.Provider value={{ ...auth, isLoading, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

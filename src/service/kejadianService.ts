@@ -85,7 +85,29 @@ export async function addInseminasi(
 	});
 }
 
-export function getPrintPdfUrl(idKejadian: string): string {
-	const base = import.meta.env.VITE_API_TARGET || "/proxy-api";
-	return `${base}/print_pdf/${idKejadian}`;
+export async function printPdf(idKejadian: string){
+	const token = localStorage.getItem("token");
+
+	const response = await fetch(`${import.meta.env.VITE_API_TARGET }/print_pdf/${idKejadian}`, {
+		method: 'GET',
+		headers: {
+			Accept: 'application/pdf',
+			...(token ? { Authorization: `Bearer ${token}` } : {}),
+		},
+	});
+
+	if (response.status === 401) {
+		localStorage.removeItem("token");
+		localStorage.removeItem("user");
+		window.location.href = "/login";
+		throw new Error("Unauthenticated");
+	}
+
+	if (!response.ok) {
+		throw new Error('Gagal ambil PDF');
+	}
+
+	const blob = await response.blob();
+	const url = URL.createObjectURL(blob);
+	window.open(url, '_blank');
 }

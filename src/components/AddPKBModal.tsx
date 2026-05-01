@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { X, Loader2, Plus } from "lucide-react";
 import { addPKB } from "../service/pkbService";
 import { getStaff } from "../service/staffService";
-import { getTickets } from "../service/ticketService";
-import { getIB } from "../service/ibService";
+// import { getTickets } from "../service/ticketService";
+import { searchTickets } from "../service/ticketService";
+import { searchIB } from "../service/ibService";
+// import { getIB } from "../service/ibService";
 import type { Staff } from "../types/Staff";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import type { IB } from "../types/Ib";
 import SearchableSelect from "./SearchableSelect";
 import type { AddPKBModalProps, PKBForm } from "../types/PKB";
@@ -15,7 +17,7 @@ const STATUS_OPTIONS = ["PKB Berhasil", "PKB Gagal"];
 const EMPTY_FORM: PKBForm = {
 	ib: "",
 	ticket: "",
-	dokumen: "",
+	kejadian:"",
 	staff: "",
 	status: "PKB Berhasil",
 	tanggal: "",
@@ -27,7 +29,9 @@ export default function AddPKBModal({
 	onClose,
 	onSuccess,
 	idKejadian,
+	pkb,
 }: AddPKBModalProps) {
+	// const isEdit = !!pkb;
 	const [form, setForm] = useState<PKBForm>(EMPTY_FORM);
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [generalError, setGeneralError] = useState<string | null>(null);
@@ -36,7 +40,7 @@ export default function AddPKBModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	const [ibList, setIbList] = useState<IB[]>([]);
@@ -60,10 +64,11 @@ export default function AddPKBModal({
 			})
 			.finally(() => setStaffLoading(false));
 
+		// setTicketLoading(true);
 		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
+		searchTickets({ kejadian: idKejadian, jenis: "PKB" }, controller.signal)
+			.then((data) => {
+				setTicketList(Array.isArray(data) ? data : []);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -73,9 +78,9 @@ export default function AddPKBModal({
 			.finally(() => setTicketLoading(false));
 
 		setIbLoading(true);
-		getIB({ page: 1 }, controller.signal)
-			.then((res) => {
-				setIbList(res.data.data);
+		searchIB({ kejadian: idKejadian},  controller.signal)
+			.then((data) => {
+				setIbList(Array.isArray(data) ? data : []);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -84,13 +89,48 @@ export default function AddPKBModal({
 			})
 			.finally(() => setIbLoading(false));
 
-		setForm(EMPTY_FORM);
+		if (pkb) {
+			setForm({
+				kejadian: pkb.id_kejadian ?? "",
+				ib: pkb.id_ib ?? "",
+				staff: pkb.id_staff ?? "",
+				ticket: pkb.id_ticket ?? "",
+				status: pkb.hasil ?? "Telah Dilakukan Tindakan",
+				tanggal: pkb.created_at ? pkb.created_at.split(" ")[0] : "",
+				keterangan: pkb.keterangan ?? "",
+			});
+		} else {
+			setForm(EMPTY_FORM);
+		}
 		setErrors({});
 		setGeneralError(null);
 
 		return () => controller.abort();
-	}, [open]);
-
+	}, [open, pkb]);
+	useEffect(() => {
+			if (!open || !form.kejadian) {
+				// eslint-disable-next-line react-hooks/set-state-in-effect
+				setTicketList([]);
+				return;
+			}
+	
+			const controller = new AbortController();
+			setTicketLoading(true);
+	
+			searchTickets({ kejadian: form.kejadian, jenis: "IB" }, controller.signal)
+				.then((data) => {
+					setTicketList(Array.isArray(data) ? data : []);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						console.error("Failed to load tickets:", err);
+					}
+				})
+				.finally(() => setTicketLoading(false));
+	
+			return () => controller.abort();
+		}, [open, form.kejadian]);
+	
 	if (!open) return null;
 
 	const staffOptions = staffList.map((s) => ({
@@ -100,12 +140,12 @@ export default function AddPKBModal({
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama ?? t.id_peternak}`,
 	}));
 
 	const ibOptions = ibList.map((ib) => ({
 		value: ib.id_ib,
-		label: `${ib.id_ib} - ${ib.pejantan ?? ib.id_kejadian}`,
+		label: `${ib.id_ib}`,
 	}));
 
 	const handleChange = (
@@ -148,7 +188,6 @@ export default function AddPKBModal({
 				kejadian: idKejadian,
 				ib: form.ib,
 				ticket: form.ticket,
-				dokumen: form.dokumen,
 				staff: form.staff,
 				status: form.status,
 				tanggal: form.tanggal,
@@ -240,17 +279,6 @@ export default function AddPKBModal({
 							placeholder="Cari Staff..."
 							loading={staffLoading}
 							error={errors.staff}
-						/>
-					</FormField>
-
-					<FormField label="No Dokumen" error={errors.dokumen}>
-						<input
-							type="text"
-							name="dokumen"
-							value={form.dokumen}
-							onChange={handleChange}
-							placeholder="Contoh: DOC-260421-PKB"
-							className={inputClass(errors.dokumen)}
 						/>
 					</FormField>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Loader2, Plus } from "lucide-react";
 import type {
 	BetinaFormPayload,
@@ -6,7 +6,7 @@ import type {
 	BetinaFormModalProps,
 } from "../types/Betina";
 import { addBetina } from "../service/betinaService";
-import { getPeternak } from "../service/peternakService";
+import { getPeternak,searchPeternak } from "../service/peternakService";
 import type { Peternak } from "../types/Peternak";
 import SearchableSelect from "./SearchableSelect";
 
@@ -17,6 +17,10 @@ const EMPTY_FORM: BetinaFormPayload = {
 	jenis: "",
 	tanggal: "",
 };
+interface PeternakOption {
+	value: string;
+	label: string;
+}
 
 export default function BetinaFormModal({
 	open,
@@ -28,8 +32,13 @@ export default function BetinaFormModal({
 	const [generalError, setGeneralError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const [peternakList, setPeternakList] = useState<Peternak[]>([]);
+	const [peternakOptions, setPeternakOptions] = useState<PeternakOption[]>([]);
+	const [initialPeternakOptions, setInitialPeternakOptions] = useState<
+		PeternakOption[]
+	>([]);
 	const [peternakLoading, setPeternakLoading] = useState(false);
+	const peternakTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const peternakControllerRef = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		if (!open) return;
@@ -37,10 +46,15 @@ export default function BetinaFormModal({
 		const controller = new AbortController();
 
 		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setPeternakLoading(true);
+	setPeternakLoading(true);
 		getPeternak({ page: 1 }, controller.signal)
 			.then((res) => {
-				setPeternakList(res.data.data);
+				const opts = res.data.data.map((p) => ({
+					value: p.id_peternak,
+					label: `${p.id_peternak} - ${p.nama}`,
+				}));
+				setInitialPeternakOptions(opts);
+				setPeternakOptions(opts);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -58,10 +72,42 @@ export default function BetinaFormModal({
 
 	if (!open) return null;
 
-	const peternakOptions = peternakList.map((p) => ({
-		value: p.id_peternak,
-		label: `${p.id_peternak} - ${p.nama}`,
-	}));
+	// const peternakOptions = peternakList.map((p) => ({
+	// 	value: p.id_peternak,
+	// 	label: `${p.id_peternak} - ${p.nama}`,
+	// }));
+	const handlePeternakSearch = (query: string) => {
+			if (peternakTimerRef.current) clearTimeout(peternakTimerRef.current);
+	
+			if (!query.trim()) {
+				setPeternakOptions(initialPeternakOptions);
+				return;
+			}
+	
+			peternakTimerRef.current = setTimeout(() => {
+				peternakControllerRef.current?.abort();
+				const controller = new AbortController();
+				peternakControllerRef.current = controller;
+				setPeternakLoading(true);
+	
+				searchPeternak({ q: query.trim() }, controller.signal)
+					.then((data) => {
+						const list = Array.isArray(data) ? data : [];
+						setPeternakOptions(
+							list.map((p) => ({
+								value: p.id_peternak,
+								label: `${p.id_peternak} - ${p.text ?? p.id_peternak}`,
+							})),
+						);
+					})
+					.catch((err) => {
+						if (err.name !== "AbortError") {
+							console.error("Failed to search peternak:", err);
+						}
+					})
+					.finally(() => setPeternakLoading(false));
+			}, 300);
+		};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -73,6 +119,12 @@ export default function BetinaFormModal({
 	const handleSelectChange = (name: string, value: string) => {
 		setForm((prev) => ({ ...prev, [name]: value }));
 		setErrors((prev) => ({ ...prev, [name]: undefined }));
+		setGeneralError(null);
+	};
+
+	const handlePeternakChange = (val: string) => {
+		setForm((prev) => ({ ...prev, peternak: val, betina: "" }));
+		setErrors((prev) => ({ ...prev, peternak: undefined, betina: undefined }));
 		setGeneralError(null);
 	};
 
@@ -166,18 +218,19 @@ export default function BetinaFormModal({
 
 					<div>
 						<label className="block text-sm font-medium text-gray-600 mb-1.5">
-							Peternak <span className="text-red-400">*</span>
+							Id Peternak <span className="text-red-400">*</span>
 						</label>
 						<SearchableSelect
 							options={peternakOptions}
 							value={form.peternak}
-							onChange={(val) => handleSelectChange("peternak", val)}
-							placeholder="Cari Peternak..."
+							onChange={handlePeternakChange}
+							onSearchChange={handlePeternakSearch}
+							placeholder="Cari ID / Nama Peternak..."
 							loading={peternakLoading}
-							error={errors.peternak}
+							error={errors.peternak ? errors.peternak[0] : undefined}
 						/>
 						{errors.peternak && (
-							<p className="text-red-500 text-xs mt-1">{errors.peternak}</p>
+							<p className="text-red-500 text-xs mt-1">{errors.peternak[0]}</p>
 						)}
 					</div>
 
