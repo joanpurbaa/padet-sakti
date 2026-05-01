@@ -12,12 +12,16 @@ export async function getStaff(
 	signal?: AbortSignal,
 ): Promise<StaffListResponse> {
 	const query = new URLSearchParams();
+
 	if (params?.sort) query.set("sort", params.sort);
 	if (params?.direction) query.set("direction", params.direction);
 	if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("per_page", "3");
 
 	const qs = query.toString();
 	const endpoint = `/staff${qs ? `?${qs}` : ""}`;
+
+  console.log(endpoint)
 
 	return apiFetch<StaffListResponse>(endpoint, {
 		method: "GET",

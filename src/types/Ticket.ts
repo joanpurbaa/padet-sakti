@@ -49,6 +49,7 @@ export interface TicketQueryParams {
 	sort?: string;
 	direction?: "asc" | "desc";
 	page?: number;
+  limit?: number;
 }
 
 export interface TicketSearchParams {
@@ -107,4 +108,5 @@ export interface DisplayTicket {
 
 export interface UseTicketsOptions {
 	search?: string;
+  limit?: number
 }
