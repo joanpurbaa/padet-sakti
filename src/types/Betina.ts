@@ -59,3 +59,26 @@ export interface BetinaFormModalProps {
 	onClose: () => void;
 	onSuccess: () => void;
 }
+
+export interface BetinaUpdatePayload {
+	eartag: string;
+	nama: string;
+	peternak: string;
+	jenis: string;
+	tanggal: string;
+}
+
+export interface BetinaUpdateErrors {
+	eartag?: string[];
+	nama?: string[];
+	peternak?: string[];
+	jenis?: string[];
+	tanggal?: string[];
+}
+
+export interface EditBetinaModalProps {
+	open: boolean;
+	onClose: () => void;
+	onSuccess: () => void;
+	betina: Betina | null;
+}

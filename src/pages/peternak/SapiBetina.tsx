@@ -4,12 +4,13 @@ import {
 	AlertCircle,
 	ChevronLeft,
 	ChevronRight,
-	// Image,
 	Plus,
+	Pencil,
 } from "lucide-react";
 import { useBetina } from "../../hooks/useBetina";
 import type { Betina } from "../../types/Betina";
 import BetinaFormModal from "../../components/BetinaFormModal";
+import EditBetinaModal from "../../components/EditBetinaModal";
 
 const COLUMNS = [
 	{ key: "no", label: "#", align: "center" as const },
@@ -17,19 +18,13 @@ const COLUMNS = [
 	{ key: "nama", label: "Nama", align: "left" as const },
 	{ key: "id_peternak", label: "ID Peternak", align: "left" as const },
 	{ key: "jenis_sapi", label: "Jenis Sapi", align: "left" as const },
-	// { key: "usia", label: "Usia", align: "center" as const },
-	// { key: "status", label: "Status", align: "center" as const },
-	// { key: "jumlah_ib", label: "Jumlah IB", align: "center" as const },
-	// { key: "riwayat_penyakit", label: "Riwayat Penyakit", align: "left" as const },
-	// { key: "tanggal_lahir", label: "Tgl Lahir", align: "left" as const },
-	// { key: "created_at", label: "Tanggal", align: "left" as const },
-	// { key: "actions", label: "", align: "center" as const },
+	{ key: "actions", label: "", align: "center" as const },
 ];
-
-// const BASE_IMAGE_URL = "https://test.dkpppkotabanjar.com/public/";
 
 export default function SapiBetina() {
 	const [showFormModal, setShowFormModal] = useState(false);
+	const [showEditModal, setShowEditModal] = useState(false);
+	const [editingBetina, setEditingBetina] = useState<Betina | null>(null);
 
 	const {
 		betinaList,
@@ -46,12 +41,17 @@ export default function SapiBetina() {
 
 	const paginationPages = buildPaginationPages(currentPage, lastPage);
 
-	const handleAdd = () => {
-		setShowFormModal(true);
+	const handleAdd = () => setShowFormModal(true);
+	const handleCloseFormModal = () => setShowFormModal(false);
+
+	const handleEdit = (betina: Betina) => {
+		setEditingBetina(betina);
+		setShowEditModal(true);
 	};
 
-	const handleCloseFormModal = () => {
-		setShowFormModal(false);
+	const handleCloseEditModal = () => {
+		setShowEditModal(false);
+		setEditingBetina(null);
 	};
 
 	return (
@@ -124,85 +124,37 @@ export default function SapiBetina() {
 									</td>
 								</tr>
 							) : (
-								betinaList.map((b: Betina, index: number) => {
-									// const isBolehIB = b.status?.toUpperCase() === "BOLEH IB";
-
-									return (
-										<tr
-											key={b.ear_tag}
-											className="group hover:bg-blue-50/40 transition-colors">
-											<td className="py-3.5 px-4 text-center text-gray-400 font-mono text-xs">
-												{from - 1 + index + 1}
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap">
-												<span className="font-semibold text-blue-600">{b.ear_tag}</span>
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap">
-												<span className="font-medium text-gray-800">{b.nama}</span>
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
-												{b.id_peternak}
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
-												{b.jenis_sapi}
-											</td>
-											{/* <td className="py-3.5 px-4 text-center text-gray-700">{b.usia}</td> */}
-											{/* <td className="py-3.5 px-4 text-center">
-												<span
-													className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${
-														isBolehIB
-															? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-															: "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
-													}`}>
-													<span
-														className={`h-1.5 w-1.5 rounded-full ${
-															isBolehIB ? "bg-emerald-400" : "bg-orange-400"
-														}`}
-													/>
-													{b.status}
-												</span>
-											</td> */}
-											{/* <td className="py-3.5 px-4 text-center">
-												<span className="inline-block bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-md">
-													{b.jumlah_ib}
-												</span>
-											</td> */}
-											{/* <td className="py-3.5 px-4 whitespace-nowrap text-gray-700 text-xs">
-												{b.riwayat_penyakit === "-" ? (
-													<span className="text-gray-300">—</span>
-												) : (
-													b.riwayat_penyakit
-												)}
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700 text-xs">
-												{b.tanggal_lahir}
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap text-gray-500 text-xs">
-												{b.created_at}
-											</td> */}
-											{/* <td className="py-3.5 px-4">
-												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-													{b.foto ? (
-														<a
-															href={`${BASE_IMAGE_URL}${b.foto}`}
-															target="_blank"
-															rel="noopener noreferrer"
-															className="p-1.5 rounded-md text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
-															title="Lihat Foto">
-															<Image size={14} />
-														</a>
-													) : (
-														<span
-															className="p-1.5 rounded-md text-gray-200 cursor-not-allowed"
-															title="Tidak ada foto">
-															<Image size={14} />
-														</span>
-													)}
-												</div>
-											</td> */}
-										</tr>
-									);
-								})
+								betinaList.map((b: Betina, index: number) => (
+									<tr
+										key={b.ear_tag}
+										className="group hover:bg-blue-50/40 transition-colors">
+										<td className="py-3.5 px-4 text-center text-gray-400 font-mono text-xs">
+											{from - 1 + index + 1}
+										</td>
+										<td className="py-3.5 px-4 whitespace-nowrap">
+											<span className="font-semibold text-blue-600">{b.ear_tag}</span>
+										</td>
+										<td className="py-3.5 px-4 whitespace-nowrap">
+											<span className="font-medium text-gray-800">{b.nama}</span>
+										</td>
+										<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
+											{b.id_peternak}
+										</td>
+										<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
+											{b.jenis_sapi}
+										</td>
+										<td className="py-3.5 px-4">
+											<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+												<button
+													onClick={() => handleEdit(b)}
+													className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+													title="Edit">
+													<Pencil size={14} />
+												</button>
+											</div>
+										</td>
+									</tr>
+								))
 							)}
 						</tbody>
 					</table>
@@ -254,6 +206,13 @@ export default function SapiBetina() {
 				onClose={handleCloseFormModal}
 				onSuccess={refetch}
 			/>
+
+			<EditBetinaModal
+				open={showEditModal}
+				onClose={handleCloseEditModal}
+				onSuccess={refetch}
+				betina={editingBetina}
+			/>
 		</div>
 	);
 }
@@ -262,28 +221,17 @@ function buildPaginationPages(
 	current: number,
 	last: number,
 ): (number | "...")[] {
-	if (last <= 7) {
-		return Array.from({ length: last }, (_, i) => i + 1);
-	}
+	if (last <= 7) return Array.from({ length: last }, (_, i) => i + 1);
 
 	const pages: (number | "...")[] = [];
 	pages.push(1);
-
-	if (current > 3) {
-		pages.push("...");
-	}
+	if (current > 3) pages.push("...");
 
 	const start = Math.max(2, current - 1);
 	const end = Math.min(last - 1, current + 1);
+	for (let i = start; i <= end; i++) pages.push(i);
 
-	for (let i = start; i <= end; i++) {
-		pages.push(i);
-	}
-
-	if (current < last - 2) {
-		pages.push("...");
-	}
-
+	if (current < last - 2) pages.push("...");
 	pages.push(last);
 
 	return pages;

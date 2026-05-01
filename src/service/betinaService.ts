@@ -2,6 +2,7 @@ import type {
 	BetinaListResponse,
 	BetinaQueryParams,
 	BetinaFormPayload,
+	BetinaUpdatePayload,
 } from "../types/Betina";
 import { apiFetch } from "./api";
 
@@ -36,6 +37,16 @@ export const searchBetina = async (
 export async function addBetina(payload: BetinaFormPayload): Promise<unknown> {
 	return apiFetch<unknown>("/add_betina", {
 		method: "POST",
+		body: JSON.stringify(payload),
+	});
+}
+
+export async function updateBetina(
+	earTag: string,
+	payload: BetinaUpdatePayload,
+): Promise<unknown> {
+	return apiFetch<unknown>(`/update_betina/${earTag}`, {
+		method: "PUT",
 		body: JSON.stringify(payload),
 	});
 }
