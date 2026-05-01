@@ -7,7 +7,7 @@ import type {
 } from "../types/Betina";
 import { addBetina } from "../service/betinaService";
 import { getPeternak,searchPeternak } from "../service/peternakService";
-import type { Peternak } from "../types/Peternak";
+// import type { Peternak } from "../types/Peternak";
 import SearchableSelect from "./SearchableSelect";
 
 const EMPTY_FORM: BetinaFormPayload = {

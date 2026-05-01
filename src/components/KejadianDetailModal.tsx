@@ -64,29 +64,31 @@ export default function KejadianFormModal({
 
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setPeternakLoading(true);
-		getPeternak({ page: 1 }, controller.signal)
-			.then((res) => {
-				const opts = res.data.data.map((p) => ({
-					value: p.id_peternak,
-					label: `${p.id_peternak} - ${p.nama}`,
-				}));
-				setInitialPeternakOptions(opts);
-				setPeternakOptions(opts);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					console.error("Failed to load peternak:", err);
-				}
-			})
-			.finally(() => setPeternakLoading(false));
-
+			searchPeternak({ }, controller.signal)
+				.then((data) => {
+					const list = Array.isArray(data) ? data : [];
+					console.log("Peternak search result:", data);
+					setPeternakOptions(
+						list.map((p) => ({
+							value: p.id_peternak,
+							label: `${p.id_peternak} - ${p.text ?? p.id_peternak}`,
+						})),
+					);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						console.error("Failed to search peternak:", err);
+					}
+				})
+				.finally(() => setPeternakLoading(false));
+		// 	console.log("Kejadian data:", kejadian);
 		if (kejadian) {
 			setForm({
 				betina: kejadian.id_betina ?? "",
 				peternak: kejadian.id_peternak ?? "",
 				status: kejadian.status ?? "Belum Ada Tindakan",
 				hasil: kejadian.hasil ?? "",
-				tanggal: "",
+				tanggal: kejadian.created_at ? kejadian.created_at.split("T")[0] : "",
 			});
 		} else {
 			setForm(EMPTY_FORM);

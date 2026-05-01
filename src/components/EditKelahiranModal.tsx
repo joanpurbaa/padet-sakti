@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { editKelahiran } from "../service/kelahiranService";
 import { getStaff } from "../service/staffService";
-import { getTickets } from "../service/ticketService";
+import { searchTickets } from "../service/ticketService";
 import type { Staff } from "../types/Staff";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import type { KejadianDetailKelahiran } from "../types/Kejadian";
 import SearchableSelect from "./SearchableSelect";
 
@@ -47,7 +47,7 @@ export default function EditKelahiranModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	useEffect(() => {
@@ -69,9 +69,10 @@ export default function EditKelahiranModal({
 			.finally(() => setStaffLoading(false));
 
 		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
+		searchTickets({ kejadian: kelahiran.id_kejadian, jenis: "Kelahiran" }, controller.signal)
+			.then((data) => {
+				const list = Array.isArray(data) ? data : [];
+				setTicketList(list);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -103,7 +104,7 @@ export default function EditKelahiranModal({
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama ?? t.id_ticket}`,
 	}));
 
 	const handleChange = (

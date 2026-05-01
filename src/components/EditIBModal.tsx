@@ -3,9 +3,10 @@ import { X, Loader2 } from "lucide-react";
 import { editIB } from "../service/ibService";
 import { getStaff } from "../service/staffService";
 import { getTickets } from "../service/ticketService";
+import { searchTickets } from "../service/ticketService";
 import { getPejantan } from "../service/pejantanService";
 import type { Staff } from "../types/Staff";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import type { Pejantan } from "../types/Pejantan";
 import type { KejadianDetailIB } from "../types/Kejadian";
 import SearchableSelect from "./SearchableSelect";
@@ -49,7 +50,7 @@ export default function EditIBModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	const [pejantanList, setPejantanList] = useState<Pejantan[]>([]);
@@ -74,9 +75,9 @@ export default function EditIBModal({
 			.finally(() => setStaffLoading(false));
 
 		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
+		searchTickets({ kejadian: ib.id_kejadian, jenis: "IB" }, controller.signal)
+			.then((data) => {
+				setTicketList(Array.isArray(data) ? data : []);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -120,12 +121,12 @@ export default function EditIBModal({
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama ?? t.id_peternak}`,
 	}));
 
 	const pejantanOptions = pejantanList.map((p) => ({
 		value: p.id_pejantan,
-		label: `${p.id_pejantan} - ${p.jenis_straw}`,
+		label: `${p.id_pejantan} - ${p.id_pembuatan} - ${p.jenis_straw}`,
 	}));
 
 	const handleChange = (

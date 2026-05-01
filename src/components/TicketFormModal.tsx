@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Loader2 } from "lucide-react";
 import { addTicket, editTicket } from "../service/ticketService";
 import { getStaff } from "../service/staffService";
-import { getPeternak } from "../service/peternakService";
+import { getPeternak,searchPeternak } from "../service/peternakService";
 import type { Staff } from "../types/Staff";
-import type { Peternak } from "../types/Peternak";
+// import type { Peternak } from "../types/Peternak";
 import type { TicketFormPayload, TicketFormErrors, TicketModalProps } from "../types/Ticket";
 import SearchableSelect from "./SearchableSelect";
 
@@ -17,6 +17,10 @@ const EMPTY_FORM: TicketFormPayload = {
 	jenis: "",
 	status: "Pending",
 };
+interface PeternakOption {
+	value: string;
+	label: string;
+}
 
 export default function TicketFormModal({
 	open,
@@ -34,8 +38,13 @@ export default function TicketFormModal({
 	const [staffList, setStaffList] = useState<Staff[]>([]);
 	const [staffLoading, setStaffLoading] = useState(false);
 
-	const [peternakList, setPeternakList] = useState<Peternak[]>([]);
-	const [peternakLoading, setPeternakLoading] = useState(false);
+	const [peternakOptions, setPeternakOptions] = useState<PeternakOption[]>([]);
+		const [initialPeternakOptions, setInitialPeternakOptions] = useState<
+			PeternakOption[]
+		>([]);
+		const [peternakLoading, setPeternakLoading] = useState(false);
+		const peternakTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+		const peternakControllerRef = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		if (!open) return;
@@ -56,13 +65,20 @@ export default function TicketFormModal({
 			.finally(() => setStaffLoading(false));
 
 		setPeternakLoading(true);
-		getPeternak({ page: 1 }, controller.signal)
-			.then((res) => {
-				setPeternakList(res.data.data);
+		searchPeternak({ }, controller.signal)
+			.then((data) => {
+				const list = Array.isArray(data) ? data : [];
+				console.log("Peternak search result:", data);
+				setPeternakOptions(
+					list.map((p) => ({
+						value: p.id_peternak,
+						label: `${p.id_peternak} - ${p.text ?? p.id_peternak}`,
+					})),
+				);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
-					console.error("Failed to load peternak:", err);
+					console.error("Failed to search peternak:", err);
 				}
 			})
 			.finally(() => setPeternakLoading(false));
@@ -90,10 +106,7 @@ export default function TicketFormModal({
 		label: `${s.id_staff} - ${s.nama}`,
 	}));
 
-	const peternakOptions = peternakList.map((p) => ({
-		value: p.id_peternak,
-		label: `${p.id_peternak} - ${p.nama}`,
-	}));
+	
 
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -109,6 +122,38 @@ export default function TicketFormModal({
 		setErrors((prev) => ({ ...prev, [name]: undefined }));
 		setGeneralError(null);
 	};
+	const handlePeternakSearch = (query: string) => {
+			if (peternakTimerRef.current) clearTimeout(peternakTimerRef.current);
+	
+			if (!query.trim()) {
+				setPeternakOptions(initialPeternakOptions);
+				return;
+			}
+	
+			peternakTimerRef.current = setTimeout(() => {
+				peternakControllerRef.current?.abort();
+				const controller = new AbortController();
+				peternakControllerRef.current = controller;
+				setPeternakLoading(true);
+	
+				searchPeternak({ q: query.trim() }, controller.signal)
+					.then((data) => {
+						const list = Array.isArray(data) ? data : [];
+						setPeternakOptions(
+							list.map((p) => ({
+								value: p.id_peternak,
+								label: `${p.id_peternak} - ${p.text ?? p.id_peternak}`,
+							})),
+						);
+					})
+					.catch((err) => {
+						if (err.name !== "AbortError") {
+							console.error("Failed to search peternak:", err);
+						}
+					})
+					.finally(() => setPeternakLoading(false));
+			}, 300);
+		};
 
 	const validate = (): boolean => {
 		const errs: TicketFormErrors = {};
@@ -210,7 +255,7 @@ export default function TicketFormModal({
 						<SearchableSelect
 							options={peternakOptions}
 							value={form.peternak}
-							onChange={(val) => handleSelectChange("peternak", val)}
+							onChange={handlePeternakSearch}
 							placeholder="Cari Peternak..."
 							loading={peternakLoading}
 							error={errors.peternak ? errors.peternak[0] : undefined}

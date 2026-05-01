@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { editPKB } from "../service/pkbService";
 import { getStaff } from "../service/staffService";
-import { getIB } from "../service/ibService";
-import { getTickets } from "../service/ticketService";
+import { searchIB } from "../service/ibService";
+import { searchTickets } from "../service/ticketService";
 import type { Staff } from "../types/Staff";
 import type { IB } from "../types/Ib";
-import type { Ticket } from "../types/Ticket";
+import type { TicketSearchItem } from "../types/Ticket";
 import type { KejadianDetailPKB } from "../types/Kejadian";
 import SearchableSelect from "./SearchableSelect";
 
@@ -20,14 +20,16 @@ interface EditPKBModalProps {
 interface PKBEditForm {
 	ib: string;
 	ticket: string;
-	dokumen: string;
 	staff: string;
 	status: string;
 	tanggal: string;
 	keterangan: string;
 }
 
-const STATUS_OPTIONS = ["PKB Berhasil", "PKB Gagal"];
+const STATUS_OPTIONS = [
+  { label: "PKB Berhasil", value: "Berhasil" },
+  { label: "PKB Gagal", value: "Gagal" },
+];
 
 export default function EditPKBModal({
 	open,
@@ -38,9 +40,8 @@ export default function EditPKBModal({
 	const [form, setForm] = useState<PKBEditForm>({
 		ib: "",
 		ticket: "",
-		dokumen: "",
 		staff: "",
-		status: "PKB Berhasil",
+		status: "",
 		tanggal: "",
 		keterangan: "",
 	});
@@ -54,7 +55,7 @@ export default function EditPKBModal({
 	const [ibList, setIbList] = useState<IB[]>([]);
 	const [ibLoading, setIbLoading] = useState(false);
 
-	const [ticketList, setTicketList] = useState<Ticket[]>([]);
+	const [ticketList, setTicketList] = useState<TicketSearchItem[]>([]);
 	const [ticketLoading, setTicketLoading] = useState(false);
 
 	useEffect(() => {
@@ -76,21 +77,21 @@ export default function EditPKBModal({
 			.finally(() => setStaffLoading(false));
 
 		setIbLoading(true);
-		getIB({ page: 1 }, controller.signal)
-			.then((res) => {
-				setIbList(res.data.data);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					console.error("Failed to load IB:", err);
-				}
-			})
-			.finally(() => setIbLoading(false));
+			searchIB({ kejadian: pkb.id_kejadian},  controller.signal)
+				.then((data) => {
+					setIbList(Array.isArray(data) ? data : []);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						console.error("Failed to load IB:", err);
+					}
+				})
+				.finally(() => setIbLoading(false));
 
 		setTicketLoading(true);
-		getTickets({ page: 1 }, controller.signal)
-			.then((res) => {
-				setTicketList(res.data.data);
+		searchTickets({ kejadian: pkb.id_kejadian, jenis: "PKB" }, controller.signal)
+			.then((data) => {
+				setTicketList(Array.isArray(data) ? data : []);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -102,12 +103,12 @@ export default function EditPKBModal({
 		setForm({
 			ib: pkb.id_ib ?? "",
 			ticket: pkb.id_ticket ?? "",
-			dokumen: pkb.no_dokumen ?? "",
 			staff: pkb.id_staff ?? "",
 			status: pkb.hasil ?? "PKB Berhasil",
 			tanggal: pkb.created_at ? pkb.created_at.split(" ")[0] : "",
 			keterangan: pkb.keterangan ?? "",
 		});
+		console.log("Loaded PKB for editing:", STATUS_OPTIONS);
 		setErrors({});
 		setGeneralError(null);
 
@@ -123,12 +124,12 @@ export default function EditPKBModal({
 
 	const ibOptions = ibList.map((ib) => ({
 		value: ib.id_ib,
-		label: `${ib.id_ib} - ${ib.pejantan ?? ib.id_kejadian}`,
+		label: `${ib.id_ib}`,
 	}));
 
 	const ticketOptions = ticketList.map((t) => ({
 		value: t.id_ticket,
-		label: `${t.id_ticket} - ${t.jenis_laporan}`,
+		label: `${t.id_ticket} - ${t.nama ?? t.id_peternak}`,
 	}));
 
 	const handleChange = (
@@ -171,7 +172,6 @@ export default function EditPKBModal({
 				kejadian: pkb.id_kejadian,
 				ib: form.ib,
 				ticket: form.ticket,
-				dokumen: form.dokumen,
 				staff: form.staff,
 				status: form.status,
 				tanggal: form.tanggal,
@@ -279,8 +279,8 @@ export default function EditPKBModal({
 							onChange={handleChange}
 							className={selectClass(errors.status)}>
 							{STATUS_OPTIONS.map((opt) => (
-								<option key={opt} value={opt}>
-									{opt}
+								<option key={opt.label} value={opt.value}>
+									{opt.label}
 								</option>
 							))}
 						</select>
