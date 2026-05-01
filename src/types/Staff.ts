@@ -33,6 +33,7 @@ export interface StaffQueryParams {
 	sort?: string;
 	direction?: "asc" | "desc";
 	page?: number;
+  limit?: number;
 }
 
 export interface StaffSearchParams {
@@ -65,4 +66,9 @@ export interface StaffFormModalProps {
 	onClose: () => void;
 	onSuccess: () => void;
 	staff?: Staff | null;
+}
+
+export interface UseStaffOptions {
+	search?: string;
+  limit?: number;
 }

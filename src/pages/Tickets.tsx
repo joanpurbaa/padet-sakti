@@ -188,8 +188,6 @@ export default function Tickets() {
 									</option>
 								))}
 							</select>
-
-							<span>entries</span>
 						</div>
 
 						<button
