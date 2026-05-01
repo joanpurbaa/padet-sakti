@@ -1,6 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import type { Staff, UseStaffOptions } from "../types/Staff";
+import type { Staff } from "../types/Staff";
 import { getStaff, searchStaff } from "../service/staffService";
+
+interface UseStaffOptions {
+	search?: string;
+}
 
 export function useStaff(options?: UseStaffOptions) {
 	const search = options?.search ?? "";
@@ -15,13 +19,11 @@ export function useStaff(options?: UseStaffOptions) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-  const limit = options?.limit;
-
 	const fetchStaff = useCallback((page: number, signal?: AbortSignal) => {
 		setLoading(true);
 		setError(null);
 
-		getStaff({ page, limit }, signal)
+		getStaff({ page }, signal)
 			.then((res) => {
 				const d = res.data;
 				setStaffs(d.data);
@@ -37,7 +39,7 @@ export function useStaff(options?: UseStaffOptions) {
 				}
 			})
 			.finally(() => setLoading(false));
-	}, [limit]);
+	}, []);
 
 	const fetchSearch = useCallback((query: string, signal?: AbortSignal) => {
 		setLoading(true);

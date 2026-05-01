@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		if (token && userRaw) {
 			try {
 				const user = JSON.parse(userRaw) as User;
+				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setAuth({ token, user, isAuthenticated: true });
 			} catch {
 				localStorage.removeItem("token");

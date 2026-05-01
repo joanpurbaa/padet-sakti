@@ -4,7 +4,7 @@ import {
 	AlertCircle,
 	ChevronLeft,
 	ChevronRight,
-	Image,
+	// Image,
 	Plus,
 } from "lucide-react";
 import { useBetina } from "../../hooks/useBetina";
@@ -17,16 +17,16 @@ const COLUMNS = [
 	{ key: "nama", label: "Nama", align: "left" as const },
 	{ key: "id_peternak", label: "ID Peternak", align: "left" as const },
 	{ key: "jenis_sapi", label: "Jenis Sapi", align: "left" as const },
-	{ key: "usia", label: "Usia", align: "center" as const },
-	{ key: "status", label: "Status", align: "center" as const },
-	{ key: "jumlah_ib", label: "Jumlah IB", align: "center" as const },
-	{ key: "riwayat_penyakit", label: "Riwayat Penyakit", align: "left" as const },
-	{ key: "tanggal_lahir", label: "Tgl Lahir", align: "left" as const },
-	{ key: "created_at", label: "Tanggal", align: "left" as const },
-	{ key: "actions", label: "", align: "center" as const },
+	// { key: "usia", label: "Usia", align: "center" as const },
+	// { key: "status", label: "Status", align: "center" as const },
+	// { key: "jumlah_ib", label: "Jumlah IB", align: "center" as const },
+	// { key: "riwayat_penyakit", label: "Riwayat Penyakit", align: "left" as const },
+	// { key: "tanggal_lahir", label: "Tgl Lahir", align: "left" as const },
+	// { key: "created_at", label: "Tanggal", align: "left" as const },
+	// { key: "actions", label: "", align: "center" as const },
 ];
 
-const BASE_IMAGE_URL = "https://test.dkpppkotabanjar.com/public/";
+// const BASE_IMAGE_URL = "https://test.dkpppkotabanjar.com/public/";
 
 export default function SapiBetina() {
 	const [showFormModal, setShowFormModal] = useState(false);
@@ -125,7 +125,7 @@ export default function SapiBetina() {
 								</tr>
 							) : (
 								betinaList.map((b: Betina, index: number) => {
-									const isBolehIB = b.status?.toUpperCase() === "BOLEH IB";
+									// const isBolehIB = b.status?.toUpperCase() === "BOLEH IB";
 
 									return (
 										<tr
@@ -146,8 +146,8 @@ export default function SapiBetina() {
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
 												{b.jenis_sapi}
 											</td>
-											<td className="py-3.5 px-4 text-center text-gray-700">{b.usia}</td>
-											<td className="py-3.5 px-4 text-center">
+											{/* <td className="py-3.5 px-4 text-center text-gray-700">{b.usia}</td> */}
+											{/* <td className="py-3.5 px-4 text-center">
 												<span
 													className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full ${
 														isBolehIB
@@ -161,13 +161,13 @@ export default function SapiBetina() {
 													/>
 													{b.status}
 												</span>
-											</td>
-											<td className="py-3.5 px-4 text-center">
+											</td> */}
+											{/* <td className="py-3.5 px-4 text-center">
 												<span className="inline-block bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-md">
 													{b.jumlah_ib}
 												</span>
-											</td>
-											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700 text-xs">
+											</td> */}
+											{/* <td className="py-3.5 px-4 whitespace-nowrap text-gray-700 text-xs">
 												{b.riwayat_penyakit === "-" ? (
 													<span className="text-gray-300">—</span>
 												) : (
@@ -179,8 +179,8 @@ export default function SapiBetina() {
 											</td>
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-500 text-xs">
 												{b.created_at}
-											</td>
-											<td className="py-3.5 px-4">
+											</td> */}
+											{/* <td className="py-3.5 px-4">
 												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
 													{b.foto ? (
 														<a
@@ -199,7 +199,7 @@ export default function SapiBetina() {
 														</span>
 													)}
 												</div>
-											</td>
+											</td> */}
 										</tr>
 									);
 								})
