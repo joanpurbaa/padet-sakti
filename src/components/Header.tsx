@@ -91,7 +91,7 @@ export default function Header() {
 						<div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
 							<div className="bg-blue-500 px-4 py-2.5">
 								<span className="text-white text-xs font-bold tracking-widest uppercase">
-									Alerts Center
+									PENDING TICKET
 								</span>
 							</div>
 							<div className="max-h-64 overflow-y-auto">
@@ -111,11 +111,11 @@ export default function Header() {
 											<p className="text-sm text-gray-700 font-medium truncate">
 												{(ticket.title as string) ??
 													(ticket.subject as string) ??
-													`Tiket #${ticket.id}`}
+													`Tiket penangan ${ticket.jenis_laporan} dari ${ticket.peternak}`}
 											</p>
 											{ticket.status && (
 												<span className="text-xs text-orange-500 font-medium capitalize">
-													{ticket.status as string}
+													{ticket.id_ticket as string}
 												</span>
 											)}
 										</div>

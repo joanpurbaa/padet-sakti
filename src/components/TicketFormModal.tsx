@@ -16,6 +16,7 @@ const EMPTY_FORM: TicketFormPayload = {
 	peternak: "",
 	jenis: "",
 	status: "Pending",
+	tanggal: "",
 };
 interface PeternakOption {
 	value: string;
@@ -89,6 +90,8 @@ export default function TicketFormModal({
 				peternak: ticket.id_peternak ?? "",
 				jenis: ticket.jenis_laporan ?? "",
 				status: ticket.status ?? "Pending",
+				tanggal: ticket.created_at ? ticket.created_at.split("T")[0] : "",
+				// Assuming created_at is in ISO format, we take the date part for the input
 			});
 		} else {
 			setForm(EMPTY_FORM);
@@ -313,6 +316,19 @@ export default function TicketFormModal({
 						{errors.status && (
 							<p className="text-red-500 text-xs mt-1">{errors.status[0]}</p>
 						)}
+					</div>
+
+					<div>
+						<label className="block text-sm font-medium text-gray-600 mb-1.5">
+							Tanggal
+						</label>
+						<input
+							type="date"
+							name="tanggal"
+							value={form.tanggal}
+							onChange={handleChange}
+							className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-800 bg-gray-50 outline-none focus:border-blue-500 focus:bg-white transition-colors"
+						/>
 					</div>
 
 					<div className="flex items-center gap-3 pt-2">

@@ -63,6 +63,7 @@ export interface AddTicketPayload {
 	peternak: string;
 	jenis: string;
 	status: string;
+	tanggal: Date;
 }
 
 export interface AddTicketErrors {
@@ -70,6 +71,7 @@ export interface AddTicketErrors {
 	peternak?: string[];
 	jenis?: string[];
 	status?: string[];
+	tanggal?: string[];
 }
 
 export interface TicketFormPayload {
@@ -77,6 +79,7 @@ export interface TicketFormPayload {
 	peternak: string;
 	jenis: string;
 	status: string;
+	tanggal: string;
 }
 
 export interface TicketFormErrors {
@@ -84,6 +87,7 @@ export interface TicketFormErrors {
 	peternak?: string[];
 	jenis?: string[];
 	status?: string[];
+	tanggal?: string[];
 }
 
 export interface TicketModalProps {
