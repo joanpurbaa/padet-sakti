@@ -9,7 +9,7 @@ export default function ProtectedRoute({
 	const { isAuthenticated, isLoading } = useAuthContext();
 
 	if (isLoading) {
-		return;
+		return <div>Loading...</div>;
 	}
 
 	if (!isAuthenticated) {

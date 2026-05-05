@@ -32,8 +32,14 @@ export default function Login() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!validate()) return;
-		const success = await handleLogin(form);
-		if (success) navigate("/dashboard");
+		const user = await handleLogin(form);
+		if (user) {
+			if (user.role === "super admin") {
+				navigate("/dashboard");
+			} else {
+				window.location.href = "http://localhost:8000/home";
+			}
+		}
 	};
 
 	return (

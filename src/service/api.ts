@@ -1,31 +1,50 @@
-const BASE_URL = import.meta.env.VITE_API_TARGET || "/proxy-api";
-// const BASE_URL = "/proxy-api";
+// const BASE_URL = import.meta.env.VITE_API_TARGET || "/proxy-api";
+const BASE_URL = "/proxy-api";
+// const BASE_URL = "http://localhost:8000";
+
+export function getCookie(name: string): string | null {
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) {
+		return decodeURIComponent(parts.pop()!.split(";").shift()!);
+	}
+	return null;
+}
+
+export async function getCsrfCookie(): Promise<void> {
+	await fetch(`${BASE_URL}/sanctum/csrf-cookie`, {
+		method: "GET",
+		credentials: "include",
+		headers: {
+			Accept: "application/json",
+		},
+	});
+}
 
 export async function apiFetch<T>(
 	endpoint: string,
 	options?: RequestInit,
 ): Promise<T> {
-	const token = localStorage.getItem("token");
-
 	const response = await fetch(`${BASE_URL}${endpoint}`, {
 		...options,
+		credentials: "include",
 		headers: {
-			"Content-Type": "application/json", 
+			"Content-Type": "application/json",
 			Accept: "application/json",
-			...(token ? { Authorization: `Bearer ${token}` } : {}),
 			...options?.headers,
 		},
 	});
 
 	if (response.status === 401) {
-		localStorage.removeItem("token");
-		localStorage.removeItem("user");
-		window.location.href = "/login";
-		throw new Error("Unauthenticated");
+		throw new Error("401");
 	}
 
 	if (!response.ok) {
-		throw new Error(`Request failed with status ${response.status}`);
+		throw new Error(`${response.status}`);
+	}
+
+	if (response.status === 204) {
+		return undefined as T;
 	}
 
 	return response.json() as Promise<T>;
