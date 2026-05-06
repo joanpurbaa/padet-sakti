@@ -21,6 +21,20 @@ export async function getCsrfCookie(): Promise<void> {
 	});
 }
 
+export async function getCsrfToken(): Promise<string> {
+	const response = await fetch(`${import.meta.env.VITE_API_TARGET}/csrf-token`, {
+		method: "GET",
+		credentials: "include",
+		headers: {
+			Accept: "application/json",
+		},
+	});
+
+	const data = await response.json();
+
+	return data.token;
+}
+
 export async function apiFetch<T>(
 	endpoint: string,
 	options?: RequestInit,
