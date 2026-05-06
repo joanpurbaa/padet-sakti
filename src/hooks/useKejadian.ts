@@ -19,11 +19,11 @@ export function useKejadian(options?: UseKejadianOptions) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchKejadian = useCallback((page: number, signal?: AbortSignal) => {
+	const fetchKejadian = useCallback((per_page: number, signal?: AbortSignal) => {
 		setLoading(true);
 		setError(null);
 
-		getKejadian({ page }, signal)
+		getKejadian({ per_page }, signal)
 			.then((res) => {
 				const d = res.data;
 				setKejadianList(d.data);

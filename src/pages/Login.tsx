@@ -37,7 +37,7 @@ export default function Login() {
 			if (user.role === "super admin") {
 				navigate("/dashboard");
 			} else {
-				window.location.href = "http://localhost:8000/home";
+				window.location.href = "https://test.dkpppkotabanjar.com/public/home";
 			}
 		}
 	};

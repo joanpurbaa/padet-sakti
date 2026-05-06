@@ -5,3 +5,8 @@ export interface TicketStatistics {
 	labels: string[];
 	data: number[];
 }
+
+export interface KejadianStatistics {
+	berhasil: number;
+	gagal: number;
+}

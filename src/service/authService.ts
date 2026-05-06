@@ -1,14 +1,14 @@
 import { apiFetch, getCsrfCookie, getCookie } from "./api";
 import type { LoginForm, User } from "../types/Auth";
 
-const BASE_URL = "/proxy-api";
+const BASE_URL = import.meta.env.VITE_API_TARGET + "/api" || "/proxy-api";
 
 export async function loginApi(form: LoginForm): Promise<User> {
 	await getCsrfCookie();
 
 	const xsrfToken = getCookie("XSRF-TOKEN");
 
-	const response = await fetch(`${BASE_URL}/spa/login`, {
+	const response = await fetch(`${import.meta.env.VITE_API_TARGET}/spa/login`, {
 		method: "POST",
 		credentials: "include",
 		headers: {
@@ -38,7 +38,7 @@ export async function loginApi(form: LoginForm): Promise<User> {
 }
 
 export async function getCurrentUser(): Promise<User> {
-	return apiFetch<User>("/api/profile", {
+	return apiFetch<User>("/profile", {
 		method: "GET",
 	});
 }

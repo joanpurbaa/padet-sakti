@@ -1,5 +1,5 @@
-// const BASE_URL = import.meta.env.VITE_API_TARGET || "/proxy-api";
-const BASE_URL = "/proxy-api";
+const BASE_URL = import.meta.env.VITE_API_TARGET + "/api" || "/proxy-api";
+// const BASE_URL = "/proxy-api";
 // const BASE_URL = "http://localhost:8000";
 
 export function getCookie(name: string): string | null {
@@ -12,7 +12,7 @@ export function getCookie(name: string): string | null {
 }
 
 export async function getCsrfCookie(): Promise<void> {
-	await fetch(`${BASE_URL}/sanctum/csrf-cookie`, {
+	await fetch(`${import.meta.env.VITE_API_TARGET}/sanctum/csrf-cookie`, {
 		method: "GET",
 		credentials: "include",
 		headers: {

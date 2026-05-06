@@ -83,7 +83,7 @@ export default function IBFormModal({
 			.finally(() => setStaffLoading(false));
 
 		setKejadianLoading(true);
-		getKejadian({ page: 1 }, controller.signal)
+		getKejadian({ per_page: 1 }, controller.signal)
 			.then((res) => {
 				setKejadianList(res.data.data);
 			})
