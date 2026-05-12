@@ -64,7 +64,7 @@ export default function SapiBetina() {
 			</div>
 
 			<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
-				<div className="flex items-center justify-between gap-3 flex-wrap">
+				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 					<div className="flex items-center gap-3">
 						<button
 							onClick={refetch}
@@ -76,7 +76,7 @@ export default function SapiBetina() {
 
 					<button
 						onClick={handleAdd}
-						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+						className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
 						<Plus size={15} />
 						Add Betina
 					</button>
@@ -144,7 +144,7 @@ export default function SapiBetina() {
 											{b.jenis_sapi}
 										</td>
 										<td className="py-3.5 px-4">
-											<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+											<div className="flex items-center justify-center gap-1 group-hover:opacity-100 transition-opacity">
 												<button
 													onClick={() => handleEdit(b)}
 													className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
@@ -160,7 +160,7 @@ export default function SapiBetina() {
 					</table>
 				</div>
 
-				<div className="flex items-center justify-between pt-2">
+				<div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 pt-2">
 					<p className="text-xs text-gray-400">
 						{loading
 							? "Memuat data..."

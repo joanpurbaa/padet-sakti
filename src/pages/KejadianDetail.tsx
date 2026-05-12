@@ -113,7 +113,6 @@ export default function KejadianDetail() {
 		setDeletingKelahiran(null);
 	};
 
-
 	if (loading) {
 		return (
 			<div className="space-y-4">
@@ -196,7 +195,7 @@ export default function KejadianDetail() {
 					</button>
 					<button
 						onClick={() => printPdf(kejadian.id_kejadian)}
-						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+						className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
 						<FileText size={14} />
 						Print PDF
 					</button>
@@ -288,7 +287,7 @@ export default function KejadianDetail() {
 											<Td muted>{item.created_at}</Td>
 											<Td muted>{item.updated_at}</Td>
 											<td className="py-3 px-4">
-												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="flex items-center justify-center gap-1 group-hover:opacity-100 transition-opacity">
 													<button
 														onClick={() => handleEditIB(item)}
 														className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
@@ -359,7 +358,7 @@ export default function KejadianDetail() {
 											<Td muted>{item.created_at}</Td>
 											<Td muted>{item.updated_at}</Td>
 											<td className="py-3 px-4">
-												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="flex items-center justify-center gap-1 group-hover:opacity-100 transition-opacity">
 													<button
 														onClick={() => handleEditPKB(item)}
 														className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
@@ -428,7 +427,7 @@ export default function KejadianDetail() {
 											<Td muted>{item.created_at}</Td>
 											<Td muted>{item.updated_at}</Td>
 											<td className="py-3 px-4">
-												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="flex items-center justify-center gap-1 group-hover:opacity-100 transition-opacity">
 													<button
 														onClick={() => handleEditKelahiran(item)}
 														className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"

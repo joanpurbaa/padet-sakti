@@ -136,7 +136,7 @@ export default function EditBetinaModal({
 					<button
 						onClick={handleSubmit}
 						disabled={submitting}
-						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50">
+						className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50">
 						{submitting && <Loader2 size={14} className="animate-spin" />}
 						{submitting ? "Menyimpan..." : "Simpan"}
 					</button>

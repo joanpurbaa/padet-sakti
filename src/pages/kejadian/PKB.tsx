@@ -27,8 +27,8 @@ export default function PKB() {
 	const {
 		pkbList,
 		total,
-		page,
-		totalPages,
+		currentPage,
+		lastPage,
 		from,
 		to,
 		loading,
@@ -37,19 +37,11 @@ export default function PKB() {
 		setPage,
 	} = usePKB();
 
-	const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+	const pagination = getPaginationRange(currentPage, lastPage);
 
-	const handleAdd = () => {
-		console.log("Add PKB");
-	};
-
-	const handleEdit = (pkb: PKBType) => {
-		console.log("Edit PKB", pkb);
-	};
-
-	const handleDelete = (pkb: PKBType) => {
-		console.log("Delete PKB", pkb);
-	};
+	const handleAdd = () => console.log("Add PKB");
+	const handleEdit = (pkb: PKBType) => console.log("Edit PKB", pkb);
+	const handleDelete = (pkb: PKBType) => console.log("Delete PKB", pkb);
 
 	return (
 		<div className="space-y-4">
@@ -61,7 +53,7 @@ export default function PKB() {
 			</div>
 
 			<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
-				<div className="flex items-center justify-between gap-3 flex-wrap">
+				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 					<div className="flex items-center gap-3">
 						<button
 							onClick={refetch}
@@ -73,7 +65,7 @@ export default function PKB() {
 
 					<button
 						onClick={handleAdd}
-						className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+						className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
 						<Plus size={15} />
 						Add PKB
 					</button>
@@ -140,15 +132,12 @@ export default function PKB() {
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
 												{pkb.id_ib}
 											</td>
-
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
 												{pkb.id_kejadian}
 											</td>
-
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
 												{pkb.id_staff}
 											</td>
-
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
 												{pkb.no_dokumen}
 											</td>
@@ -161,9 +150,7 @@ export default function PKB() {
 															: "bg-orange-50 text-orange-600 ring-1 ring-orange-200"
 													}`}>
 													<span
-														className={`h-1.5 w-1.5 rounded-full ${
-															isBerhasil ? "bg-emerald-400" : "bg-orange-400"
-														}`}
+														className={`h-1.5 w-1.5 rounded-full ${isBerhasil ? "bg-emerald-400" : "bg-orange-400"}`}
 													/>
 													{pkb.hasil}
 												</span>
@@ -172,13 +159,12 @@ export default function PKB() {
 											<td className="py-3.5 px-4 text-gray-700">
 												{pkb.keterangan ?? "—"}
 											</td>
-
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-500 text-xs">
 												{pkb.created_at}
 											</td>
 
 											<td className="py-3.5 px-4">
-												<div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="flex items-center justify-center gap-1 group-hover:opacity-100 transition-opacity">
 													<button
 														onClick={() => handleEdit(pkb)}
 														className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
@@ -201,7 +187,7 @@ export default function PKB() {
 					</table>
 				</div>
 
-				<div className="flex items-center justify-between pt-2">
+				<div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2 pt-2">
 					<p className="text-xs text-gray-400">
 						{loading
 							? "Memuat data..."
@@ -210,24 +196,30 @@ export default function PKB() {
 
 					<div className="flex items-center gap-1">
 						<PaginationBtn
-							onClick={() => setPage(page - 1)}
-							disabled={page <= 1 || loading}>
+							onClick={() => setPage(currentPage - 1)}
+							disabled={currentPage <= 1 || loading}>
 							<ChevronLeft size={14} />
 						</PaginationBtn>
 
-						{pages.map((p) => (
-							<PaginationBtn
-								key={p}
-								onClick={() => setPage(p)}
-								disabled={loading}
-								active={p === page}>
-								{p}
-							</PaginationBtn>
-						))}
+						{pagination.map((item, index) =>
+							item === "..." ? (
+								<span key={`dots-${index}`} className="px-2 text-gray-400">
+									...
+								</span>
+							) : (
+								<PaginationBtn
+									key={`page-${item}-${index}`}
+									onClick={() => setPage(item as number)}
+									disabled={loading}
+									active={item === currentPage}>
+									{item}
+								</PaginationBtn>
+							),
+						)}
 
 						<PaginationBtn
-							onClick={() => setPage(page + 1)}
-							disabled={page >= totalPages || loading}>
+							onClick={() => setPage(currentPage + 1)}
+							disabled={currentPage >= lastPage || loading}>
 							<ChevronRight size={14} />
 						</PaginationBtn>
 					</div>
@@ -242,6 +234,34 @@ interface PaginationBtnProps {
 	disabled?: boolean;
 	active?: boolean;
 	children: React.ReactNode;
+}
+
+function getPaginationRange(current: number, total: number) {
+	const delta = 1;
+	const result: (number | string)[] = [];
+
+	const left = Math.max(2, current - delta);
+	const right = Math.min(total - 1, current + delta);
+
+	result.push(1);
+
+	if (left > 2) {
+		result.push("...");
+	}
+
+	for (let i = left; i <= right; i++) {
+		result.push(i);
+	}
+
+	if (right < total - 1) {
+		result.push("...");
+	}
+
+	if (total > 1) {
+		result.push(total);
+	}
+
+	return result;
 }
 
 function PaginationBtn({

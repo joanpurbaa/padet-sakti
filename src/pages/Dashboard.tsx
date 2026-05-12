@@ -25,7 +25,7 @@ type IconKey = "calendar" | "check" | "peternak" | "petugas";
 
 interface StatCardConfig {
 	title: string;
-	valueKey: "today" | "selesai" | "peternak" | "petugas";
+	valueKey: "today" | "selesai" | "peternak" | "staff";
 	icon: IconKey;
 	bg: string;
 	iconColor: string;
@@ -59,7 +59,7 @@ const STAT_CARDS: StatCardConfig[] = [
 	},
 	{
 		title: "Total Petugas",
-		valueKey: "petugas",
+		valueKey: "staff",
 		icon: "petugas",
 		bg: "bg-purple-50",
 		iconColor: "text-purple-500",
@@ -75,47 +75,52 @@ const ICON_MAP: Record<IconKey, React.ReactNode> = {
 };
 
 const PIE_COLORS: Record<string, string> = {
-	berhasil: "#22c55e",
-	gagal: "#ef4444",
+	"IB Berhasil": "#22c55e",
+	"IB Gagal": "#ef4444",
+	"Telah dilakukan Inseminasi Buatan": "#f59e0b",
 };
 
-const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_OPTIONS = [2023, 2024, 2025, CURRENT_YEAR];
+// GANTI DENGAN URL TABLEAU ASLI
+const DETAILING_URL = "https://your-tableau-dashboard-url.com";
 
 export default function Dashboard() {
 	const {
 		stats,
-		kejadianStats,
+		ibStats,
 		loading,
 		error,
 		refetch,
 		selectedYear,
 		setSelectedYear,
-		chartData, // ← pakai chartData dari hook (sudah terfilter tahun)
+		chartData,
+		availableYears,
 	} = useDashboardStats();
 
-	const total = (kejadianStats?.berhasil ?? 0) + (kejadianStats?.gagal ?? 0);
-	const pieData = kejadianStats
+	// Siapkan data untuk pie chart (hanya Berhasil dan Gagal)
+	const pieData = ibStats
 		? [
 				{
-					name: `Berhasil (${kejadianStats.berhasil}) ${
-						total > 0 ? Math.round((kejadianStats.berhasil / total) * 100) : 0
-					}%`,
-					value: kejadianStats.berhasil,
-					color: PIE_COLORS.berhasil,
+					name: `IB Berhasil (${ibStats.data[0]})`,
+					value: ibStats.data[0],
+					color: PIE_COLORS["IB Berhasil"],
 				},
 				{
-					name: `Gagal (${kejadianStats.gagal}) ${
-						total > 0 ? Math.round((kejadianStats.gagal / total) * 100) : 0
-					}%`,
-					value: kejadianStats.gagal,
-					color: PIE_COLORS.gagal,
+					name: `IB Gagal (${ibStats.data[1]})`,
+					value: ibStats.data[1],
+					color: PIE_COLORS["IB Gagal"],
 				},
 			].filter((d) => d.value > 0)
 		: [];
 
+	const total = (ibStats?.data[0] ?? 0) + (ibStats?.data[1] ?? 0);
+	const berhasilPercent =
+		total > 0 ? Math.round(((ibStats?.data[0] ?? 0) / total) * 100) : 0;
+	const gagalPercent =
+		total > 0 ? Math.round(((ibStats?.data[1] ?? 0) / total) * 100) : 0;
+
 	return (
 		<div className="space-y-6">
+			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div>
 					<p className="text-xs text-gray-400 mb-0.5">Home</p>
@@ -123,7 +128,6 @@ export default function Dashboard() {
 						DASHBOARD
 					</h1>
 				</div>
-
 				<button
 					onClick={refetch}
 					disabled={loading}
@@ -140,6 +144,7 @@ export default function Dashboard() {
 				</div>
 			)}
 
+			{/* 4 Stat Cards */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 				{STAT_CARDS.map((card) => (
 					<StatCard
@@ -151,7 +156,9 @@ export default function Dashboard() {
 				))}
 			</div>
 
+			{/* Charts Row */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+				{/* Bar Chart - Jumlah Tiket per Bulan */}
 				<div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
 					<div className="flex items-center justify-between mb-6">
 						<h2 className="text-sm font-semibold text-gray-600">
@@ -159,9 +166,9 @@ export default function Dashboard() {
 						</h2>
 						<select
 							value={selectedYear}
-							onChange={(e) => setSelectedYear(Number(e.target.value))}
+							onChange={(e) => setSelectedYear(e.target.value)}
 							className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-							{YEAR_OPTIONS.map((year) => (
+							{availableYears.map((year) => (
 								<option key={year} value={year}>
 									{year}
 								</option>
@@ -213,9 +220,10 @@ export default function Dashboard() {
 					)}
 				</div>
 
+				{/* Pie Chart - Success Rate IB */}
 				<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col">
 					<h2 className="text-sm font-semibold text-gray-600 mb-4">
-						Success Rate Kejadian
+						Persentase Keberhasilan IB
 					</h2>
 
 					{loading ? (
@@ -224,7 +232,7 @@ export default function Dashboard() {
 						</div>
 					) : pieData.length === 0 ? (
 						<div className="flex-1 flex items-center justify-center text-sm text-gray-400">
-							Tidak ada data kejadian (Berhasil/Gagal)
+							Tidak ada data IB
 						</div>
 					) : (
 						<div className="flex-1 flex flex-col justify-between">
@@ -237,7 +245,12 @@ export default function Dashboard() {
 										innerRadius={52}
 										outerRadius={78}
 										paddingAngle={3}
-										dataKey="value">
+										dataKey="value"
+										label={({ name, percent }) => {
+											const value = name.match(/\d+/)?.[0];
+											return `${value || ""} (${(percent * 100).toFixed(0)}%)`;
+										}}
+										labelLine={false}>
 										{pieData.map((entry, index) => (
 											<Cell key={`cell-${index}`} fill={entry.color} />
 										))}
@@ -248,16 +261,43 @@ export default function Dashboard() {
 											border: "1px solid #e5e7eb",
 											fontSize: "12px",
 										}}
+										formatter={(value, name) => [
+											`${value} kejadian`,
+											name.split("(")[0].trim(),
+										]}
 									/>
 									<Legend
 										iconType="circle"
 										iconSize={8}
-										formatter={(value) => (
-											<span style={{ fontSize: "11px", color: "#6b7280" }}>{value}</span>
-										)}
+										formatter={(value) => {
+											const match = value.match(/IB (\w+)/);
+											const status = match ? match[1] : value;
+											const count = value.match(/\d+/)?.[0];
+											const percent =
+												status === "Berhasil" ? berhasilPercent : gagalPercent;
+											return (
+												<span style={{ fontSize: "11px", color: "#6b7280" }}>
+													{status} ({count}) {percent}%
+												</span>
+											);
+										}}
+										layout="horizontal"
+										verticalAlign="bottom"
+										align="center"
 									/>
 								</PieChart>
 							</ResponsiveContainer>
+
+							{/* Detailing Link */}
+							<div className="flex justify-end pt-2 border-t border-gray-50 mt-2">
+								<a
+									href={DETAILING_URL}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 font-medium transition-colors">
+									Detailing →
+								</a>
+							</div>
 						</div>
 					)}
 				</div>

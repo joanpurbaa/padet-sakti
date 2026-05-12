@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getPKB } from "../service/pkbService";
 import type { PKB } from "../types/PKB";
 
@@ -6,28 +6,25 @@ export function usePKB() {
 	const [pkbList, setPkbList] = useState<PKB[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [lastPage, setLastPage] = useState(1);
 	const [total, setTotal] = useState(0);
 	const [from, setFrom] = useState(0);
 	const [to, setTo] = useState(0);
-	const controllerRef = useRef<AbortController | null>(null);
 
-	const fetchPKB = useCallback((p: number) => {
-		controllerRef.current?.abort();
-		const controller = new AbortController();
-		controllerRef.current = controller;
-
+	const fetchPKB = useCallback((p: number, signal: AbortSignal) => {
 		setLoading(true);
 		setError(null);
 
-		getPKB({ page: p }, controller.signal)
+		getPKB({ page: p }, signal)
 			.then((res) => {
-				setPkbList(res.data.data);
-				setTotalPages(res.data.last_page);
-				setTotal(res.data.total);
-				setFrom(res.data.from);
-				setTo(res.data.to);
+				const d = res.data;
+				setPkbList(d.data);
+				setTotal(d.total);
+				setCurrentPage(d.current_page);
+				setLastPage(d.last_page);
+				setFrom(d.from ?? 0);
+				setTo(d.to ?? 0);
 			})
 			.catch((err) => {
 				if (err.name !== "AbortError") {
@@ -38,25 +35,30 @@ export function usePKB() {
 	}, []);
 
 	useEffect(() => {
+		const controller = new AbortController();
 		// eslint-disable-next-line react-hooks/set-state-in-effect
-		fetchPKB(page);
-		return () => controllerRef.current?.abort();
-	}, [page, fetchPKB]);
-
+		fetchPKB(currentPage, controller.signal);
+		return () => controller.abort();
+	}, [currentPage, fetchPKB]);
+  
 	const refetch = useCallback(() => {
-		fetchPKB(page);
-	}, [page, fetchPKB]);
+    fetchPKB(currentPage);
+	}, [currentPage, fetchPKB]);
+
+	const setPage = useCallback((p: number) => {
+		setCurrentPage(p);
+	}, []);
 
 	return {
 		pkbList,
 		loading,
 		error,
-		page,
-		setPage,
-		totalPages,
+		currentPage,
+		lastPage,
 		total,
 		from,
 		to,
 		refetch,
+		setPage,
 	};
 }

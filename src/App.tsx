@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,12 +19,17 @@ import KejadianDetail from "./pages/KejadianDetail";
 import Peternak from "./pages/Peternak";
 
 function MainLayout() {
+	const [mobileOpen, setMobileOpen] = useState(false);
+
 	return (
 		<div className="flex h-screen overflow-hidden bg-gray-100">
-			<Sidebar />
+			<Sidebar
+				mobileOpen={mobileOpen}
+				onMobileClose={() => setMobileOpen(false)}
+			/>
 			<div className="flex flex-col flex-1 overflow-hidden">
-				<Header />
-				<main className="flex-1 p-6 overflow-auto">
+				<Header onMenuClick={() => setMobileOpen(true)} />
+				<main className="flex-1 p-4 md:p-6 overflow-auto">
 					<Routes>
 						<Route path="/dashboard" element={<Dashboard />} />
 						<Route path="/tickets" element={<Tickets />} />

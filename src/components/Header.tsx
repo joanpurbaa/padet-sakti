@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, UserCircle, LogOut, Loader2 } from "lucide-react";
+import { Bell, UserCircle, LogOut, Loader2, Menu } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthContext } from "../context/AuthContext";
 import { apiFetch } from "../service/api";
@@ -12,7 +12,12 @@ interface PendingTicket {
 	[key: string]: unknown;
 }
 
-export default function Header() {
+interface HeaderProps {
+	/** Dipanggil saat hamburger diklik — buka sidebar drawer di mobile */
+	onMenuClick: () => void;
+}
+
+export default function Header({ onMenuClick }: HeaderProps) {
 	const [open, setOpen] = useState(false);
 	const [notifOpen, setNotifOpen] = useState(false);
 	const [loggingOut, setLoggingOut] = useState(false);
@@ -72,7 +77,19 @@ export default function Header() {
 	};
 
 	return (
-		<header className="bg-white h-14 flex items-center justify-end px-6 shadow-sm border-b border-orange-100 shrink-0">
+		<header className="bg-white h-14 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-orange-100 shrink-0">
+			{/* Hamburger — hanya muncul di mobile (< md) */}
+			<button
+				onClick={onMenuClick}
+				className="md:hidden flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+				aria-label="Buka menu">
+				<Menu size={20} />
+			</button>
+
+			{/* Spacer di desktop agar isi kanan tetap justify-end */}
+			<div className="hidden md:block" />
+
+			{/* Kanan: notif + user */}
 			<div className="flex items-center gap-5">
 				<div className="relative" ref={notifRef}>
 					<button onClick={handleNotifToggle} className="relative cursor-pointer">
