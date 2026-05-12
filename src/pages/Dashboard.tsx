@@ -247,8 +247,8 @@ export default function Dashboard() {
 										paddingAngle={3}
 										dataKey="value"
 										label={({ name, percent }) => {
-											const value = name.match(/\d+/)?.[0];
-											return `${value || ""} (${(percent * 100).toFixed(0)}%)`;
+											const value = name?.match(/\d+/)?.[0];
+											return `${value || ""} (${(Number(percent) * 100).toFixed(0)}%)`;
 										}}
 										labelLine={false}>
 										{pieData.map((entry, index) => (
@@ -263,7 +263,7 @@ export default function Dashboard() {
 										}}
 										formatter={(value, name) => [
 											`${value} kejadian`,
-											name.split("(")[0].trim(),
+											name?.split("(")[0].trim(),
 										]}
 									/>
 									<Legend
