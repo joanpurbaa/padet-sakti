@@ -42,7 +42,8 @@ export function usePKB() {
 	}, [currentPage, fetchPKB]);
   
 	const refetch = useCallback(() => {
-    fetchPKB(currentPage);
+		const controller = new AbortController();
+		fetchPKB(currentPage, controller.signal);
 	}, [currentPage, fetchPKB]);
 
 	const setPage = useCallback((p: number) => {

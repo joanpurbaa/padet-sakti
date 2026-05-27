@@ -263,7 +263,7 @@ export default function Dashboard() {
 										}}
 										formatter={(value, name) => [
 											`${value} kejadian`,
-											name?.split("(")[0].trim(),
+											String(name).split("(")[0].trim(),
 										]}
 									/>
 									<Legend

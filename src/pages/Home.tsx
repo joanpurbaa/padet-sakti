@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 
 const FEATURES = [
@@ -114,8 +112,17 @@ const WORKFLOW = [
 const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 const BARS = [90, 72, 46, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+const NAV_LINKS = [
+	["Tentang", "#tentang"],
+	["Fitur", "#fitur"],
+	["Preview", "#preview"],
+	["Manfaat", "#manfaat"],
+	["Alur Kerja", "#alurkerja"],
+];
+
 function Navbar() {
 	const [scrolled, setScrolled] = useState(false);
+	const [mobileOpen, setMobileOpen] = useState(false);
 
 	useEffect(() => {
 		const fn = () => setScrolled(window.scrollY > 50);
@@ -125,7 +132,7 @@ function Navbar() {
 
 	return (
 		<nav
-			className={`fixed top-0 left-0 right-0 z-50 px-10 transition-all duration-300 ${
+			className={`fixed top-0 left-0 right-0 z-50 px-5 md:px-10 transition-all duration-300 ${
 				scrolled
 					? "bg-[#FEFAF6]/95 border-b border-[#E8DDD3] backdrop-blur-md"
 					: "bg-transparent border-b border-transparent"
@@ -146,14 +153,8 @@ function Navbar() {
 						</div>
 					</div>
 				</div>
-				<div className="flex items-center gap-6">
-					{[
-						["Tentang", "#tentang"],
-						["Fitur", "#fitur"],
-						["Preview", "#preview"],
-						["Manfaat", "#manfaat"],
-						["Alur Kerja", "#alurkerja"],
-					].map(([label, href]) => (
+				<div className="hidden md:flex items-center gap-6">
+					{NAV_LINKS.map(([label, href]) => (
 						<a
 							key={label}
 							href={href}
@@ -167,7 +168,44 @@ function Navbar() {
 						Masuk Sistem
 					</a>
 				</div>
+				<button
+					className="md:hidden flex flex-col justify-center gap-1.5 w-8 h-8"
+					onClick={() => setMobileOpen(!mobileOpen)}>
+					<span
+						className={`block w-5 h-0.5 bg-[#3B1A08] transition-all duration-200 ${
+							mobileOpen ? "rotate-45 translate-y-2" : ""
+						}`}
+					/>
+					<span
+						className={`block w-5 h-0.5 bg-[#3B1A08] transition-all duration-200 ${
+							mobileOpen ? "opacity-0" : ""
+						}`}
+					/>
+					<span
+						className={`block w-5 h-0.5 bg-[#3B1A08] transition-all duration-200 ${
+							mobileOpen ? "-rotate-45 -translate-y-2" : ""
+						}`}
+					/>
+				</button>
 			</div>
+			{mobileOpen && (
+				<div className="md:hidden bg-[#FEFAF6] border-t border-[#E8DDD3] pb-5">
+					{NAV_LINKS.map(([label, href]) => (
+						<a
+							key={label}
+							href={href}
+							onClick={() => setMobileOpen(false)}
+							className="block py-3.5 text-[14px] text-[#5C2D0A] font-medium no-underline border-b border-[#E8DDD3] last:border-b-0">
+							{label}
+						</a>
+					))}
+					<a
+						href="#"
+						className="block mt-4 bg-[#D97706] text-white py-3 rounded-[5px] text-[13.5px] font-semibold no-underline text-center">
+						Masuk Sistem
+					</a>
+				</div>
+			)}
 		</nav>
 	);
 }
@@ -320,7 +358,7 @@ function MockBrowserBar({ url }: { url: string }) {
 
 function HeroDashboardMockup() {
 	return (
-		<div className="relative">
+		<div className="relative hidden md:block">
 			<div className="absolute -top-6 -right-6 w-40 h-40 rounded-full bg-[#FEF3C7] -z-10" />
 			<div className="absolute -bottom-4 -left-4 w-18 h-18 rounded-full bg-[#E8D5C0] -z-10" />
 			<div
@@ -349,13 +387,13 @@ function HeroDashboardMockup() {
 
 function Hero() {
 	return (
-		<section className="bg-[#FEFAF6] pt-32 pb-22 px-10">
-			<div className="max-w-290 mx-auto grid grid-cols-2 gap-16 items-center">
+		<section className="bg-[#FEFAF6] pt-24 pb-14 md:pt-32 md:pb-22 px-5 md:px-10">
+			<div className="max-w-290 mx-auto grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16 items-center">
 				<div>
 					<div className="inline-block bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold px-3 py-1.5 rounded-[3px] tracking-[.07em] uppercase mb-6">
 						Dinas Pangan Kota Banjar
 					</div>
-					<h1 className="font-serif text-[2.7rem] font-semibold leading-[1.28] text-[#3B1A08] mb-5">
+					<h1 className="font-serif text-[1.9rem] md:text-[2.7rem] font-semibold leading-[1.28] text-[#3B1A08] mb-5">
 						Sistem Pengelolaan
 						<br />
 						Pangan dan Monitoring
@@ -367,7 +405,7 @@ function Hero() {
 						memantau kondisi ternak, dan mengelola seluruh aktivitas lapangan secara
 						terpusat dan terstruktur.
 					</p>
-					<div className="flex gap-3 mb-11">
+					<div className="flex flex-wrap gap-3 mb-8 md:mb-11">
 						<a
 							href="#fitur"
 							className="bg-[#3B1A08] text-white px-6 py-3 rounded-[5px] text-sm font-semibold no-underline">
@@ -379,7 +417,7 @@ function Hero() {
 							Lihat Dashboard →
 						</a>
 					</div>
-					<div className="pt-7 border-t border-[#E8DDD3] flex gap-10">
+					<div className="pt-7 border-t border-[#E8DDD3] flex gap-6 md:gap-10">
 						{[
 							["745+", "Tiket Diselesaikan"],
 							["202", "Peternak Terdaftar"],
@@ -402,13 +440,13 @@ function Hero() {
 
 function About() {
 	return (
-		<section id="tentang" className="bg-[#3B1A08] py-22 px-10">
-			<div className="max-w-290 mx-auto grid grid-cols-2 gap-20 items-center">
+		<section id="tentang" className="bg-[#3B1A08] py-14 md:py-22 px-5 md:px-10">
+			<div className="max-w-290 mx-auto grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-20 items-center">
 				<div>
 					<div className="text-[11px] font-bold text-[#D97706] tracking-widest uppercase mb-4">
 						Tentang Sistem
 					</div>
-					<h2 className="font-serif text-[2.2rem] font-semibold text-[#FEF3C7] leading-[1.35] mb-5">
+					<h2 className="font-serif text-[1.6rem] md:text-[2.2rem] font-semibold text-[#FEF3C7] leading-[1.35] mb-5">
 						Dibangun dari kebutuhan nyata pengelolaan ternak daerah
 					</h2>
 					<p className="text-[14.5px] leading-[1.85] text-[#FEF3C7]/70 mb-4">
@@ -461,31 +499,36 @@ function About() {
 
 function Features() {
 	return (
-		<section id="fitur" className="bg-[#FEFAF6] py-23 px-10">
+		<section id="fitur" className="bg-[#FEFAF6] py-14 md:py-23 px-5 md:px-10">
 			<div className="max-w-290 mx-auto">
-				<div className="flex justify-between items-end mb-13">
+				<div className="flex flex-col gap-4 mb-10 md:flex-row md:justify-between md:items-end md:mb-13">
 					<div>
 						<div className="text-[11px] font-bold text-[#D97706] tracking-widest uppercase mb-3">
 							Fitur Sistem
 						</div>
-						<h2 className="font-serif text-[2.2rem] font-semibold text-[#3B1A08] leading-[1.3] max-w-110">
+						<h2 className="font-serif text-[1.6rem] md:text-[2.2rem] font-semibold text-[#3B1A08] leading-[1.3] max-w-110">
 							Semua kebutuhan pengelolaan ternak dalam satu platform
 						</h2>
 					</div>
-					<p className="text-sm text-[#7C6A56] max-w-70 text-right leading-[1.75]">
+					<p className="text-sm text-[#7C6A56] max-w-70 md:text-right leading-[1.75]">
 						Dari pencatatan laporan harian hingga pemantauan populasi dan tingkat
 						keberhasilan inseminasi buatan.
 					</p>
 				</div>
-				<div className="grid grid-cols-3 border border-[#E8DDD3]">
+				<div className="grid grid-cols-1 md:grid-cols-3 border border-[#E8DDD3]">
 					{FEATURES.map(({ num, title, desc, featured }, i) => (
 						<div
 							key={num}
-							className="p-8"
+							className={[
+								"p-6 md:p-8 border-[#E8DDD3]",
+								i < 5 ? "border-b" : "",
+								i >= 3 ? "md:border-b-0" : "",
+								(i + 1) % 3 !== 0 ? "md:border-r" : "",
+							]
+								.filter(Boolean)
+								.join(" ")}
 							style={{
 								background: featured ? "#3B1A08" : i % 2 === 1 ? "#FDF6EE" : "#FEFAF6",
-								borderRight: (i + 1) % 3 !== 0 ? "1px solid #E8DDD3" : undefined,
-								borderBottom: i < 3 ? "1px solid #E8DDD3" : undefined,
 							}}>
 							<div
 								className="text-[11px] font-bold tracking-[.06em] uppercase mb-3"
@@ -539,27 +582,27 @@ function Preview() {
 	return (
 		<section
 			id="preview"
-			className="bg-[#FDF6EE] py-22 px-10 border-t border-[#E8DDD3]">
+			className="bg-[#FDF6EE] py-14 md:py-22 px-5 md:px-10 border-t border-[#E8DDD3]">
 			<div className="max-w-290 mx-auto">
-				<div className="text-center mb-[52px]">
-					<div className="inline-block text-[11px] font-bold text-[#D97706] tracking-[.1em] uppercase mb-3">
+				<div className="text-center mb-10 md:mb-13">
+					<div className="inline-block text-[11px] font-bold text-[#D97706] tracking-widest uppercase mb-3">
 						Tampilan Sistem
 					</div>
-					<h2 className="font-serif text-[2.2rem] font-semibold text-[#3B1A08] mb-3">
+					<h2 className="font-serif text-[1.6rem] md:text-[2.2rem] font-semibold text-[#3B1A08] mb-3">
 						Antarmuka yang bersih dan mudah digunakan
 					</h2>
-					<p className="text-[14.5px] text-[#7C6A56] max-w-[460px] mx-auto">
+					<p className="text-[14.5px] text-[#7C6A56] max-w-115 mx-auto">
 						Dirancang agar dapat dioperasikan oleh petugas dari berbagai latar
 						belakang teknis.
 					</p>
 				</div>
-				<div className="grid gap-5" style={{ gridTemplateColumns: "1.3fr 1fr" }}>
+				<div className="grid grid-cols-1 gap-5 md:grid-cols-[1.3fr_1fr]">
 					<div
 						className="rounded-[10px] overflow-hidden border border-[#E8DDD3]"
 						style={{ boxShadow: "0 4px 24px rgba(59,26,8,.11)" }}>
 						<MockBrowserBar url="padetsakti.banjar.go.id/dashboard" />
-						<div className="flex min-h-[320px]">
-							<div className="w-[128px]">
+						<div className="flex min-h-80">
+							<div className="w-32">
 								<DashboardMockupSidebar active="Dashboard" />
 							</div>
 							<div className="flex-1 bg-[#F5F5F4] p-3.5">
@@ -580,8 +623,8 @@ function Preview() {
 						className="rounded-[10px] overflow-hidden border border-[#E8DDD3]"
 						style={{ boxShadow: "0 4px 24px rgba(59,26,8,.11)" }}>
 						<MockBrowserBar url="padetsakti.banjar.go.id/tickets" />
-						<div className="flex min-h-[320px]">
-							<div className="w-[96px] bg-[#2D1306] p-2.5">
+						<div className="flex min-h-80">
+							<div className="w-24 bg-[#2D1306] p-2.5">
 								<div className="text-center mb-3">
 									<div className="w-7 h-7 rounded-full bg-[#D97706] mx-auto flex items-center justify-center text-xs">
 										🐄
@@ -645,28 +688,26 @@ function Preview() {
 
 function Benefits() {
 	return (
-		<section id="manfaat" className="bg-[#FEFAF6] py-[92px] px-10">
-			<div className="max-w-[1160px] mx-auto">
-				<div className="text-[11px] font-bold text-[#D97706] tracking-[.1em] uppercase mb-3">
+		<section id="manfaat" className="bg-[#FEFAF6] py-14 md:py-23 px-5 md:px-10">
+			<div className="max-w-290 mx-auto">
+				<div className="text-[11px] font-bold text-[#D97706] tracking-widest uppercase mb-3">
 					Manfaat
 				</div>
-				<h2 className="font-serif text-[2.2rem] font-semibold text-[#3B1A08] leading-[1.3] mb-[52px]">
+				<h2 className="font-serif text-[1.6rem] md:text-[2.2rem] font-semibold text-[#3B1A08] leading-[1.3] mb-10 md:mb-13">
 					Dirasakan langsung oleh semua yang terlibat
 				</h2>
-				<div className="grid grid-cols-4 gap-8">
+				<div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
 					{BENEFITS.map(({ role, icon, accent, points }) => (
 						<div
 							key={role}
 							className="pt-6"
 							style={{ borderTop: `3px solid ${accent ? "#D97706" : "#E8DDD3"}` }}>
 							<div className="text-[26px] mb-3">{icon}</div>
-							<div className="text-[15px] font-bold text-[#3B1A08] mb-[18px]">
-								{role}
-							</div>
+							<div className="text-[15px] font-bold text-[#3B1A08] mb-4.5">{role}</div>
 							<ul className="list-none">
 								{points.map((p, i) => (
 									<li key={i} className="flex gap-2 items-start mb-3">
-										<span className="text-[#D97706] text-[13px] font-bold flex-shrink-0 mt-0.5">
+										<span className="text-[#D97706] text-[13px] font-bold shrink-0 mt-0.5">
 											✓
 										</span>
 										<span className="text-[13.5px] text-[#5C2D0A] leading-[1.65]">
@@ -687,27 +728,27 @@ function Workflow() {
 	return (
 		<section
 			id="alurkerja"
-			className="bg-[#FDF6EE] py-[92px] px-10 border-t border-b border-[#E8DDD3]">
-			<div className="max-w-[1160px] mx-auto">
-				<div className="text-center mb-[60px]">
-					<div className="inline-block text-[11px] font-bold text-[#D97706] tracking-[.1em] uppercase mb-3">
+			className="bg-[#FDF6EE] py-14 md:py-23 px-5 md:px-10 border-t border-b border-[#E8DDD3]">
+			<div className="max-w-290 mx-auto">
+				<div className="text-center mb-10 md:mb-15">
+					<div className="inline-block text-[11px] font-bold text-[#D97706] tracking-widest uppercase mb-3">
 						Alur Kerja
 					</div>
-					<h2 className="font-serif text-[2.2rem] font-semibold text-[#3B1A08] mb-3">
+					<h2 className="font-serif text-[1.6rem] md:text-[2.2rem] font-semibold text-[#3B1A08] mb-3">
 						Dari laporan hingga arsip — semua tertangani
 					</h2>
-					<p className="text-[14.5px] text-[#7C6A56] max-w-[460px] mx-auto">
+					<p className="text-[14.5px] text-[#7C6A56] max-w-115 mx-auto">
 						Alur operasional yang sederhana memastikan setiap laporan ditangani dengan
 						tepat dan terdokumentasi secara lengkap.
 					</p>
 				</div>
 				<div className="relative">
-					<div className="absolute top-[26px] left-[10%] right-[10%] h-px bg-[#E8DDD3]" />
-					<div className="grid grid-cols-5 relative z-10">
+					<div className="absolute top-6.5 left-[10%] right-[10%] h-px bg-[#E8DDD3] hidden md:block" />
+					<div className="grid grid-cols-1 gap-8 md:grid-cols-5 md:gap-0 relative z-10">
 						{WORKFLOW.map(({ num, label, desc, first }) => (
 							<div key={num} className="text-center px-4">
 								<div
-									className="w-[52px] h-[52px] rounded-full mx-auto mb-4 flex items-center justify-center"
+									className="w-13 h-13 rounded-full mx-auto mb-4 flex items-center justify-center"
 									style={{
 										background: first ? "#3B1A08" : "#fff",
 										border: `2px solid ${first ? "#3B1A08" : "#E8DDD3"}`,
@@ -734,10 +775,10 @@ function Workflow() {
 
 function CTAStrip() {
 	return (
-		<section className="bg-[#D97706] py-14 px-10">
-			<div className="max-w-[1160px] mx-auto flex justify-between items-center">
+		<section className="bg-[#D97706] py-10 md:py-14 px-5 md:px-10">
+			<div className="max-w-290 mx-auto flex flex-col gap-6 md:flex-row md:justify-between md:items-center md:gap-0">
 				<div>
-					<h2 className="font-serif text-[1.9rem] font-semibold text-white mb-2">
+					<h2 className="font-serif text-[1.4rem] md:text-[1.9rem] font-semibold text-white mb-2">
 						Siap menggunakan Padet Sakti?
 					</h2>
 					<p className="text-[14.5px] text-white/82">
@@ -747,7 +788,7 @@ function CTAStrip() {
 				</div>
 				<a
 					href="#"
-					className="bg-white text-[#D97706] px-7 py-3.5 rounded-[5px] text-sm font-bold no-underline whitespace-nowrap flex-shrink-0">
+					className="bg-white text-[#D97706] px-7 py-3.5 rounded-[5px] text-sm font-bold no-underline whitespace-nowrap shrink-0 text-center">
 					Masuk ke Sistem →
 				</a>
 			</div>
@@ -757,18 +798,12 @@ function CTAStrip() {
 
 function Footer() {
 	return (
-		<footer className="bg-[#1C0D03] pt-[52px] pb-8 px-10">
-			<div className="max-w-[1160px] mx-auto">
-				<div
-					className="grid gap-12 mb-10"
-					style={{ gridTemplateColumns: "2fr 1fr 1fr" }}>
+		<footer className="bg-[#1C0D03] pt-10 md:pt-13 pb-8 px-5 md:px-10">
+			<div className="max-w-290 mx-auto">
+				<div className="grid grid-cols-1 gap-8 mb-8 md:grid-cols-[2fr_1fr_1fr] md:gap-12 md:mb-10">
 					<div>
 						<div className="flex items-center gap-2.5 mb-4">
-							<img
-								src="/icon.png"
-								alt="Logo"
-								className="w-[30px] h-[30px] object-contain"
-							/>
+							<img src="/icon.png" alt="Logo" className="w-7.5 h-7.5 object-contain" />
 							<div>
 								<div className="font-serif text-[15px] font-semibold text-[#FEF3C7]">
 									Padet Sakti
@@ -776,7 +811,7 @@ function Footer() {
 								<div className="text-[10.5px] text-[#7C6A56]">Laskar Arta</div>
 							</div>
 						</div>
-						<p className="text-[13px] text-[#FEF3C7]/45 leading-[1.85] max-w-[300px]">
+						<p className="text-[13px] text-[#FEF3C7]/45 leading-[1.85] max-w-75">
 							Sistem Pengelolaan Pangan dan Monitoring Ternak Dinas Pangan Kota Banjar.
 							Dibangun untuk mendukung ketahanan pangan daerah.
 						</p>
@@ -813,7 +848,7 @@ function Footer() {
 						</div>
 					</div>
 				</div>
-				<div className="border-t border-white/[.07] pt-5 flex justify-between">
+				<div className="border-t border-white/[.07] pt-5 flex flex-col gap-1 md:flex-row md:justify-between md:gap-0">
 					<div className="text-[12px] text-[#FEF3C7]/25">
 						© 2026 Padet Sakti — Laskar Arta. Hak cipta dilindungi.
 					</div>
