@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Sidebar from "./components/Sidebar";
@@ -17,6 +17,7 @@ import SapiBetina from "./pages/peternak/SapiBetina";
 import Kejadian from "./pages/Kejadian";
 import KejadianDetail from "./pages/KejadianDetail";
 import Peternak from "./pages/Peternak";
+import Home from "./pages/Home";
 
 function MainLayout() {
 	const [mobileOpen, setMobileOpen] = useState(false);
@@ -55,7 +56,7 @@ export default function App() {
 		<BrowserRouter>
 			<AuthProvider>
 				<Routes>
-					<Route path="/" element={<Navigate to="/login" replace />} />
+					<Route path="/" element={<Home />} />
 					<Route path="/login" element={<Login />} />
 					<Route
 						path="/*"
