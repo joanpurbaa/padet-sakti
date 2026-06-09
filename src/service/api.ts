@@ -39,12 +39,17 @@ export async function apiFetch<T>(
 	endpoint: string,
 	options?: RequestInit,
 ): Promise<T> {
+	await getCsrfCookie();
+	const csrfToken = await getCsrfToken()
+	const xsrfToken = getCookie("XSRF-TOKEN");
 	const response = await fetch(`${BASE_URL}${endpoint}`, {
 		...options,
 		credentials: "include",
 		headers: {
 			"Content-Type": "application/json",
 			Accept: "application/json",
+			"X-XSRF-TOKEN": xsrfToken || "",
+			"X-CSRF-TOKen": csrfToken || "",
 			...options?.headers,
 		},
 	});
