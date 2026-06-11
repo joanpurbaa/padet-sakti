@@ -19,7 +19,7 @@ const COLUMNS = [
 	{ key: "no", label: "#", align: "center" as const },
 	{ key: "id_peternak", label: "ID Peternak", align: "left" as const },
 	{ key: "nama", label: "Nama", align: "left" as const },
-	{ key: "alamat", label: "Alamat", align: "left" as const },
+	// { key: "alamat", label: "Alamat", align: "left" as const },
 	{ key: "kecamatan", label: "Kecamatan", align: "left" as const },
 	{ key: "kelurahan", label: "Kelurahan", align: "left" as const },
 	{ key: "jenis_ternak", label: "Jenis Ternak", align: "center" as const },
@@ -221,9 +221,9 @@ export default function Peternak() {
 											<td className="py-3.5 px-4 whitespace-nowrap">
 												<span className="font-medium text-gray-800">{p.nama}</span>
 											</td>
-											<td className="py-3.5 px-4 text-gray-700 max-w-xs truncate">
+											{/* <td className="py-3.5 px-4 text-gray-700 max-w-xs truncate">
 												{p.alamat}
-											</td>
+											</td> */}
 											<td className="py-3.5 px-4 whitespace-nowrap text-gray-700">
 												{p.kecamatan ?? <span className="text-gray-300 text-xs">—</span>}
 											</td>

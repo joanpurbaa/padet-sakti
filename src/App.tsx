@@ -18,6 +18,7 @@ import Kejadian from "./pages/Kejadian";
 import KejadianDetail from "./pages/KejadianDetail";
 import Peternak from "./pages/Peternak";
 import Home from "./pages/Home";
+import PelaporanPeternak from "./pages/PelaporanPeternak";
 
 function MainLayout() {
 	const [mobileOpen, setMobileOpen] = useState(false);
@@ -44,6 +45,7 @@ function MainLayout() {
 						<Route path="/kejadian/pkb" element={<PKB />} />
 						<Route path="/kejadian/kelahiran" element={<Kelahiran />} />
 						<Route path="/peternak/sapi-betina" element={<SapiBetina />} />
+						<Route path="/pelaporan-peternak" element={<PelaporanPeternak />} />
 					</Routes>
 				</main>
 			</div>
@@ -58,6 +60,16 @@ export default function App() {
 				<Routes>
 					<Route path="/" element={<Home />} />
 					<Route path="/login" element={<Login />} />
+
+					<Route
+						path="/pelaporan-peternak"
+						element={
+							<ProtectedRoute>
+								<PelaporanPeternak />
+							</ProtectedRoute>
+						}
+					/>
+
 					<Route
 						path="/*"
 						element={
