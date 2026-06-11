@@ -17,11 +17,8 @@ import type { KejadianSubItem, SideNavItemProps } from "../types/Sidebar";
 const SIDEBAR_BG = "bg-[#3b1f0e]";
 const SUBMENU_BG = "bg-[#4d2a14]";
 
-// ─── Props ────────────────────────────────────────────────────────────────────
 interface SidebarProps {
-	/** Controlled by parent Layout — whether the mobile drawer is open */
 	mobileOpen: boolean;
-	/** Called when user closes the drawer (backdrop click / X button) */
 	onMobileClose: () => void;
 }
 
@@ -70,7 +67,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 					md:transition-[width] md:duration-300
 					${collapsed ? "md:w-16" : "md:w-64"}
 				`}>
-				<div className="flex items-center justify-between px-3 py-5 border-b border-[#5a3a1e]">
+				<div className="flex items-center justify-center px-3 py-5 border-b border-[#5a3a1e]">
 					<img
 						src="/icon.png"
 						alt="Logo"
@@ -302,10 +299,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 	);
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
 interface SideNavItemPropsExtended extends SideNavItemProps {
-	/** Called on navigation so the mobile drawer can close */
 	onNavigate?: () => void;
 }
 
