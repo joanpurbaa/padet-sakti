@@ -46,8 +46,9 @@ export async function searchPenyakit(
 
 export async function addPenyakit(
 	payload: AddPenyakitPayload,
-): Promise<{ status: string }> {
-	return apiFetch<{ status: string }>("/add_penyakit", {
+): Promise<{ status: string; data: Penyakit }> {
+	console.log("Adding penyakit with payload:", payload);
+	return apiFetch<{ status: string; data: Penyakit }>("/add_penyakit", {
 		method: "POST",
 		body: JSON.stringify(payload),
 	});
@@ -56,8 +57,9 @@ export async function addPenyakit(
 export async function editPenyakit(
 	id: string,
 	payload: EditPenyakitPayload,
-): Promise<{ status: string }> {
-	return apiFetch<{ status: string }>(`/edit_penyakit/${id}`, {
+): Promise<{ status: string; data: Penyakit }> {
+	console.log("Editing penyakit with ID:", id, "payload:", payload);
+	return apiFetch<{ status: string; data: Penyakit }>(`/edit_penyakit/${id}`, {
 		method: "PUT",
 		body: JSON.stringify(payload),
 	});
@@ -71,17 +73,15 @@ export async function printPenyakit(
 	id: string,
 	signal?: AbortSignal,
 ): Promise<Blob> {
-	const response = await fetch(
-		`${import.meta.env.VITE_API_TARGET}/api/print_BA/${id}`,
-		{
-			method: "GET",
-			credentials: "include",
-			headers: {
-				Accept: "application/pdf",
-			},
-			signal,
+	const BASE_URL = import.meta.env.VITE_API_TARGET + "/api" || "/proxy-api";
+	const response = await fetch(`${BASE_URL}/print_BA/${id}`, {
+		method: "GET",
+		credentials: "include",
+		headers: {
+			Accept: "application/pdf",
 		},
-	);
+		signal,
+	});
 
 	if (!response.ok) {
 		throw new Error(`Failed to print: ${response.status}`);

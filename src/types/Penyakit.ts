@@ -62,7 +62,7 @@ export interface AddPenyakitPayload {
 	tanggal: string;
 }
 
-export type EditPenyakitPayload = AddPenyakitPayload
+export type EditPenyakitPayload = AddPenyakitPayload;
 
 export interface PenyakitFormPayload {
 	id_ticket: string;

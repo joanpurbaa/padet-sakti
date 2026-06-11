@@ -38,7 +38,7 @@ interface TicketOption {
 	label: string;
 }
 
-// Komponen InputField dipindahkan ke luar
+// Komponen InputField
 interface InputFieldProps {
 	label: string;
 	name: keyof PenyakitFormPayload;
@@ -82,7 +82,7 @@ const InputField = ({
 	</div>
 );
 
-// Komponen TextAreaField dipindahkan ke luar
+// Komponen TextAreaField
 interface TextAreaFieldProps {
 	label: string;
 	name: keyof PenyakitFormPayload;
@@ -121,7 +121,7 @@ const TextAreaField = ({
 	</div>
 );
 
-// Komponen SelectField dipindahkan ke luar
+// Komponen SelectField
 interface SelectFieldProps {
 	label: string;
 	name: keyof PenyakitFormPayload;
@@ -188,7 +188,6 @@ export default function PenyakitFormModal({
 
 		const controller = new AbortController();
 
-		// Load initial tickets
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setTicketLoading(true);
 		getTickets({ page: 1, limit: 100 }, controller.signal)
@@ -342,21 +341,43 @@ export default function PenyakitFormModal({
 		setGeneralError(null);
 
 		const payload = {
-			...form,
+			id_ticket: form.id_ticket,
+			signalment_nama: form.signalment_nama,
+			signalment_kelurahan: form.signalment_kelurahan,
+			signalment_kecamatan: form.signalment_kecamatan,
+			signalment_jenis: form.signalment_jenis,
+			signalment_ras: form.signalment_ras,
+			signalment_jenisKelamin: form.signalment_jenisKelamin,
 			signalment_umur: Number(form.signalment_umur),
 			signalment_berat: Number(form.signalment_berat),
-			tanggal: new Date(form.tanggal).toISOString(),
+			signalment_warna: form.signalment_warna,
+			signalment_ear_tag: form.signalment_ear_tag,
+			anamnesa: form.anamnesa,
+			status_umum: form.status_umum,
+			status_mukosa: form.status_mukosa,
+			status_suhu: form.status_suhu,
+			simptom: form.simptom,
+			diagnosa: form.diagnosa,
+			pengobatan: form.pengobatan,
+			prognosis: form.prognosis,
+			tanggal: form.tanggal,
 		};
 
+		console.log("Submitting payload:", payload);
+
 		try {
+			let response;
 			if (isEdit && penyakit) {
-				await editPenyakit(penyakit.id_penyakit, payload);
+				response = await editPenyakit(penyakit.id_penyakit, payload);
+				console.log("Edit response:", response);
 			} else {
-				await addPenyakit(payload);
+				response = await addPenyakit(payload);
+				console.log("Add response:", response);
 			}
 			onSuccess();
 			onClose();
 		} catch (err: unknown) {
+			console.error("Submit error:", err);
 			if (err instanceof Error) {
 				setGeneralError(err.message);
 			} else {
