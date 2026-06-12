@@ -163,7 +163,7 @@ function Navbar() {
 						</a>
 					))}
 					<a
-						href="#"
+						href="/login"
 						className="bg-[#D97706] hover:bg-[#B45309] text-white px-4.5 py-2 rounded-[5px] text-[13.5px] font-semibold no-underline transition-colors">
 						Masuk Sistem
 					</a>
