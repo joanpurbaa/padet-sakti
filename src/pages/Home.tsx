@@ -391,20 +391,21 @@ function Hero() {
 			<div className="max-w-290 mx-auto grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16 items-center">
 				<div>
 					<div className="inline-block bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold px-3 py-1.5 rounded-[3px] tracking-[.07em] uppercase mb-6">
-						Dinas Pangan Kota Banjar
+						Dinas Ketahanan Pangan, Pertanian, dan Perikanan Kota Banjar
 					</div>
-					<h1 className="font-serif text-[1.9rem] md:text-[2.7rem] font-semibold leading-[1.28] text-[#3B1A08] mb-5">
-						Sistem Pengelolaan
+					<h1 className="font-serif text-[1.9rem] md:text-[2.2rem] font-semibold leading-[1.28] text-[#3B1A08] mb-7">
+						Sistem Pengelolaan Data Peternakan dari Pelayanan Kesehatan Hewan dengan
+						Sistem Aksi Terintegrasi
 						<br />
-						Pangan dan Monitoring
-						<br />
-						<em className="text-[#D97706] not-italic">Ternak Kota Banjar</em>
+						<em className="text-[#D97706] not-italic">Kota Banjar</em>
 					</h1>
-					<p className="text-[15.5px] leading-[1.8] text-[#5C2D0A] mb-8 max-w-107.5">
-						Padet Sakti membantu Dinas Pangan Kota Banjar mencatat laporan peternak,
-						memantau kondisi ternak, dan mengelola seluruh aktivitas lapangan secara
-						terpusat dan terstruktur.
-					</p>
+					<div className="border-l-4 border-[#D97706] pl-5 mb-8">
+						<p className="text-[17px] md:text-[18px] leading-8 text-[#6B4F3A] max-w-[520px]">
+							Padet Sakti membantu Dinas Ketahanan Pangan, Pertanian, dan Perikanan Kota Banjar mencatat laporan peternak,
+							memantau kondisi ternak, dan mengelola seluruh aktivitas lapangan secara
+							terpusat dan terstruktur.
+						</p>
+					</div>
 					<div className="flex flex-wrap gap-3 mb-8 md:mb-11">
 						<a
 							href="#fitur"
@@ -450,15 +451,11 @@ function About() {
 						Dibangun dari kebutuhan nyata pengelolaan ternak daerah
 					</h2>
 					<p className="text-[14.5px] leading-[1.85] text-[#FEF3C7]/70 mb-4">
-						Padet Sakti lahir dari kebutuhan Dinas Pangan Kota Banjar untuk
-						mendigitalisasi proses pengelolaan ternak yang selama ini dilakukan secara
-						manual. Data yang tersebar, laporan yang lambat, dan koordinasi yang tidak
-						efisien menjadi latar belakang sistem ini.
-					</p>
-					<p className="text-[14.5px] leading-[1.85] text-[#FEF3C7]/70">
-						Dirancang untuk semua kalangan — dari peternak di lapangan hingga
-						administrator dinas — dengan antarmuka sederhana yang mengikuti alur kerja
-						yang sudah ada sehari-hari.
+						Padet Sakti lahir dari kebutuhan Bidang Peternakan di Dinas Ketahanan
+						Pangan, Pertanian & Perikanan, untuk mendigitalisasi proses operasional
+						bidang peternakan yang selama ini dilakukan secara manual. Data yang
+						tersebar, laporan yang lambat, dan koordinasi yang tidak efisien menjadi
+						latar belakang sistem ini.
 					</p>
 				</div>
 				<div className="grid grid-cols-2 gap-3.5">

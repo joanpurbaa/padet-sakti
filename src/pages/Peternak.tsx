@@ -46,6 +46,8 @@ export default function Peternak() {
 	);
 	const deferredSearch = useDeferredValue(search);
 
+	const [limit, setLimit] = useState(10);
+
 	const {
 		peternakList,
 		total,
@@ -115,6 +117,22 @@ export default function Peternak() {
 									<X size={14} />
 								</button>
 							)}
+						</div>
+
+						<div className="flex items-center gap-2 text-sm text-gray-500">
+							<select
+								value={limit}
+								onChange={(e) => {
+									setPage(1);
+									setLimit(Number(e.target.value));
+								}}
+								className="border border-gray-200 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+								{[5, 10, 25, 50, 100].map((num) => (
+									<option key={num} value={num}>
+										{num}
+									</option>
+								))}
+							</select>
 						</div>
 
 						<button
