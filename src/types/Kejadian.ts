@@ -33,7 +33,8 @@ export interface KejadianQueryParams {
 	sort?: string;
 	direction?: "asc" | "desc";
 	page?: number;
-	per_page: number;
+	per_page?: number;
+  limit?: number;
 }
 
 export interface KejadianFormPayload {

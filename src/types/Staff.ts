@@ -33,6 +33,7 @@ export interface StaffQueryParams {
 	sort?: string;
 	direction?: "asc" | "desc";
 	page?: number;
+	limit?: number;
 }
 
 export interface StaffSearchParams {

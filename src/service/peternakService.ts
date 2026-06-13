@@ -16,6 +16,7 @@ export async function getPeternak(
 	if (params?.sort) query.set("sort", params.sort);
 	if (params?.direction) query.set("direction", params.direction);
 	if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("per_page", String(params.limit));
 
 	const qs = query.toString();
 	const endpoint = `/peternak${qs ? `?${qs}` : ""}`;

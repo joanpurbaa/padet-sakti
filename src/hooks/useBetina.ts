@@ -2,7 +2,13 @@ import { useEffect, useState, useCallback } from "react";
 import type { Betina } from "../types/Betina";
 import { getBetina } from "../service/betinaService";
 
-export function useBetina() {
+interface UseBetinaOptions {
+	limit?: number;
+}
+
+export function useBetina(options?: UseBetinaOptions) {
+	const limit = options?.limit;
+
 	const [betinaList, setBetinaList] = useState<Betina[]>([]);
 	const [total, setTotal] = useState(0);
 	const [currentPage, setCurrentPage] = useState(1);
@@ -12,27 +18,30 @@ export function useBetina() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchBetina = useCallback((page: number, signal?: AbortSignal) => {
-		setLoading(true);
-		setError(null);
+	const fetchBetina = useCallback(
+		(page: number, signal?: AbortSignal) => {
+			setLoading(true);
+			setError(null);
 
-		getBetina({ page }, signal as AbortSignal)
-			.then((res) => {
-				const d = res.data;
-				setBetinaList(d.data);
-				setTotal(d.total);
-				setCurrentPage(d.current_page);
-				setLastPage(d.last_page);
-				setFrom(d.from ?? 0);
-				setTo(d.to ?? 0);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					setError(String(err));
-				}
-			})
-			.finally(() => setLoading(false));
-	}, []);
+			getBetina({ page, limit }, signal as AbortSignal)
+				.then((res) => {
+					const d = res.data;
+					setBetinaList(d.data);
+					setTotal(d.total);
+					setCurrentPage(d.current_page);
+					setLastPage(d.last_page);
+					setFrom(d.from ?? 0);
+					setTo(d.to ?? 0);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						setError(String(err));
+					}
+				})
+				.finally(() => setLoading(false));
+		},
+		[limit],
+	);
 
 	useEffect(() => {
 		const controller = new AbortController();

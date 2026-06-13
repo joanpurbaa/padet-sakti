@@ -12,6 +12,7 @@ export const getBetina = async (
 ) => {
 	const query = new URLSearchParams();
 	if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("per_page", String(params.limit));
 	return await apiFetch<BetinaListResponse>(`/betina?${query.toString()}`, {
 		signal,
 	});

@@ -2,7 +2,13 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { getKelahiran } from "../service/kelahiranService";
 import type { Kelahiran } from "../types/Kelahiran";
 
-export const useKelahiran = () => {
+interface UseKelahiranOptions {
+	limit?: number;
+}
+
+export const useKelahiran = (options?: UseKelahiranOptions) => {
+	const limit = options?.limit;
+
 	const [kelahiranList, setKelahiranList] = useState<Kelahiran[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -21,7 +27,7 @@ export const useKelahiran = () => {
 		setLoading(true);
 		setError(null);
 
-		getKelahiran({ page: p }, controller.signal)
+		getKelahiran({ page: p, limit }, controller.signal)
 			.then((res) => {
 				setKelahiranList(res.data.data);
 				setTotalPages(res.data.last_page);
@@ -37,7 +43,7 @@ export const useKelahiran = () => {
 				}
 			})
 			.finally(() => setLoading(false));
-	}, []);
+	}, [limit]);
 
 	useEffect(() => {
 		// eslint-disable-next-line react-hooks/set-state-in-effect

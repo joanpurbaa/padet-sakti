@@ -48,7 +48,7 @@ export default function IB() {
 		refetch,
 		setPage,
 		isSearching,
-	} = useIB({ search: deferredSearch });
+	} = useIB({ search: deferredSearch, limit });
 
 	const pagination = getPaginationRange(currentPage, lastPage);
 

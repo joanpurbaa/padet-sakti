@@ -4,11 +4,13 @@ import { getStaff, searchStaff } from "../service/staffService";
 
 interface UseStaffOptions {
 	search?: string;
+	limit?: number;
 }
 
 export function useStaff(options?: UseStaffOptions) {
 	const search = options?.search ?? "";
 	const isSearching = search.trim().length > 0;
+	const limit = options?.limit;
 
 	const [staffs, setStaffs] = useState<Staff[]>([]);
 	const [total, setTotal] = useState(0);
@@ -19,27 +21,32 @@ export function useStaff(options?: UseStaffOptions) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchStaff = useCallback((page: number, signal?: AbortSignal) => {
-		setLoading(true);
-		setError(null);
+	const fetchStaff = useCallback(
+		(page: number, signal?: AbortSignal) => {
+			setLoading(true);
+			setError(null);
 
-		getStaff({ page }, signal)
-			.then((res) => {
-				const d = res.data;
-				setStaffs(d.data);
-				setTotal(d.total);
-				setCurrentPage(d.current_page);
-				setLastPage(d.last_page);
-				setFrom(d.from ?? 0);
-				setTo(d.to ?? 0);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					setError(String(err));
-				}
-			})
-			.finally(() => setLoading(false));
-	}, []);
+			getStaff({ page, limit }, signal)
+				.then((res) => {
+					const all = res.data.data;
+					const start = (currentPage - 1) * (limit ?? 10);
+					const sliced = all.slice(start, start + (limit ?? 10));
+
+					setStaffs(sliced);
+					setTotal(all.length);
+					setLastPage(Math.ceil(all.length / (limit ?? 10)));
+					setFrom(start + 1);
+					setTo(start + sliced.length);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						setError(String(err));
+					}
+				})
+				.finally(() => setLoading(false));
+		},
+		[currentPage, limit],
+	);
 
 	const fetchSearch = useCallback((query: string, signal?: AbortSignal) => {
 		setLoading(true);

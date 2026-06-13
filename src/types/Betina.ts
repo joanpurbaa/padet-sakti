@@ -36,6 +36,7 @@ export interface BetinaListResponse {
 
 export interface BetinaQueryParams {
 	page?: number;
+	limit?: number;
 }
 
 export interface BetinaFormPayload {

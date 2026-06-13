@@ -34,6 +34,7 @@ export interface KelahiranListResponse {
 
 export interface KelahiranQueryParams {
 	page?: number;
+  limit?: number;
 }
 
 export interface KelahiranFormPayload {

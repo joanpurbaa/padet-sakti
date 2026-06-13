@@ -38,6 +38,7 @@ export interface IBQueryParams {
 	sort?: string;
 	direction?: "asc" | "desc";
 	page?: number;
+  limit?: number;
 }
 
 export interface IBSearchParams {

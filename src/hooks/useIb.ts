@@ -4,10 +4,12 @@ import type { IB } from "../types/Ib";
 
 interface UseIBOptions {
 	search?: string;
+  limit?: number;
 }
 
 export function useIB(options?: UseIBOptions) {
 	const search = options?.search ?? "";
+  const limit = options?.limit;
 	const isSearching = search.trim().length > 0;
 
 	const [ibList, setIBList] = useState<IB[]>([]);
@@ -23,7 +25,7 @@ export function useIB(options?: UseIBOptions) {
 		setLoading(true);
 		setError(null);
 
-		getIB({ page }, signal)
+		getIB({ page, limit }, signal)
 			.then((res) => {
 				const d = res.data;
 				setIBList(d.data);
@@ -39,7 +41,7 @@ export function useIB(options?: UseIBOptions) {
 				}
 			})
 			.finally(() => setLoading(false));
-	}, []);
+	}, [limit]);
 
 	const fetchSearch = useCallback((query: string, signal?: AbortSignal) => {
 		setLoading(true);

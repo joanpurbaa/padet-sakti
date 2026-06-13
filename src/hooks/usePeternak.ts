@@ -4,12 +4,14 @@ import type { Peternak, PeternakSearchItem } from "../types/Peternak";
 
 interface UsePeternakOptions {
 	search?: string;
+  limit?: number;
 }
 
 type DisplayPeternak = Peternak | PeternakSearchItem;
 
 export function usePeternak(options?: UsePeternakOptions) {
 	const search = options?.search ?? "";
+  const limit = options?.limit;
 	const isSearching = search.trim().length > 0;
 
 	const [peternakList, setPeternakList] = useState<DisplayPeternak[]>([]);
@@ -25,7 +27,7 @@ export function usePeternak(options?: UsePeternakOptions) {
 		setLoading(true);
 		setError(null);
 
-		getPeternak({ page, sort: "id_peternak", direction: "desc" }, signal)
+		getPeternak({ page, sort: "id_peternak", direction: "desc", limit }, signal)
 			.then((res) => {
 				const d = res.data;
 				setPeternakList(d.data);
@@ -41,7 +43,7 @@ export function usePeternak(options?: UsePeternakOptions) {
 				}
 			})
 			.finally(() => setLoading(false));
-	}, []);
+	}, [limit]);
 
 	const fetchSearch = useCallback((query: string, signal?: AbortSignal) => {
 		setLoading(true);

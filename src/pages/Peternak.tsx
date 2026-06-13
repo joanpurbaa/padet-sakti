@@ -60,7 +60,7 @@ export default function Peternak() {
 		refetch,
 		setPage,
 		isSearching,
-	} = usePeternak({ search: deferredSearch });
+	} = usePeternak({ search: deferredSearch, limit });
 
 	const paginationPages = buildPaginationPages(currentPage, lastPage);
 

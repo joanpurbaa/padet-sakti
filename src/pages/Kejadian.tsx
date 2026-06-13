@@ -55,7 +55,7 @@ export default function Kejadian() {
 		refetch,
 		setPage,
 		isSearching,
-	} = useKejadian({ search: deferredSearch });
+	} = useKejadian({ search: deferredSearch, limit });
 
 	const pagination = getPaginationRange(currentPage, lastPage);
 

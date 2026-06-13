@@ -40,6 +40,7 @@ export interface PeternakQueryParams {
 	sort?: string;
 	direction?: "asc" | "desc";
 	page?: number;
+  limit?: number;
 }
 
 export interface PeternakSearchParams {

@@ -34,6 +34,7 @@ export interface PKBListResponse {
 
 export interface PKBQueryParams {
 	page?: number;
+  limit?: number;
 }
 
 export interface PKBFormPayload {

@@ -2,7 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import { getPKB } from "../service/pkbService";
 import type { PKB } from "../types/PKB";
 
-export function usePKB() {
+interface UsePKBOptions {
+	limit?: number;
+}
+
+export function usePKB(options?: UsePKBOptions) {
+	const limit = options?.limit;
 	const [pkbList, setPkbList] = useState<PKB[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -12,27 +17,30 @@ export function usePKB() {
 	const [from, setFrom] = useState(0);
 	const [to, setTo] = useState(0);
 
-	const fetchPKB = useCallback((p: number, signal: AbortSignal) => {
-		setLoading(true);
-		setError(null);
+	const fetchPKB = useCallback(
+		(p: number, signal: AbortSignal) => {
+			setLoading(true);
+			setError(null);
 
-		getPKB({ page: p }, signal)
-			.then((res) => {
-				const d = res.data;
-				setPkbList(d.data);
-				setTotal(d.total);
-				setCurrentPage(d.current_page);
-				setLastPage(d.last_page);
-				setFrom(d.from ?? 0);
-				setTo(d.to ?? 0);
-			})
-			.catch((err) => {
-				if (err.name !== "AbortError") {
-					setError(err instanceof Error ? err.message : "Gagal memuat data PKB");
-				}
-			})
-			.finally(() => setLoading(false));
-	}, []);
+			getPKB({ page: p, limit }, signal)
+				.then((res) => {
+					const d = res.data;
+					setPkbList(d.data);
+					setTotal(d.total);
+					setCurrentPage(d.current_page);
+					setLastPage(d.last_page);
+					setFrom(d.from ?? 0);
+					setTo(d.to ?? 0);
+				})
+				.catch((err) => {
+					if (err.name !== "AbortError") {
+						setError(err instanceof Error ? err.message : "Gagal memuat data PKB");
+					}
+				})
+				.finally(() => setLoading(false));
+		},
+		[limit],
+	);
 
 	useEffect(() => {
 		const controller = new AbortController();
@@ -40,7 +48,7 @@ export function usePKB() {
 		fetchPKB(currentPage, controller.signal);
 		return () => controller.abort();
 	}, [currentPage, fetchPKB]);
-  
+
 	const refetch = useCallback(() => {
 		const controller = new AbortController();
 		fetchPKB(currentPage, controller.signal);

@@ -4,10 +4,12 @@ import { getKejadian, searchKejadian } from "../service/kejadianService";
 
 interface UseKejadianOptions {
 	search?: string;
+  limit?: number;
 }
 
 export function useKejadian(options?: UseKejadianOptions) {
 	const search = options?.search ?? "";
+  const limit = options?.limit;
 	const isSearching = search.trim().length > 0;
 
 	const [kejadianList, setKejadianList] = useState<Kejadian[]>([]);
@@ -19,11 +21,11 @@ export function useKejadian(options?: UseKejadianOptions) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchKejadian = useCallback((per_page: number, signal?: AbortSignal) => {
+	const fetchKejadian = useCallback((page: number, signal?: AbortSignal) => {
 		setLoading(true);
 		setError(null);
 
-		getKejadian({ per_page }, signal)
+		getKejadian({ page, limit }, signal)
 			.then((res) => {
 				const d = res.data;
 				setKejadianList(d.data);
@@ -39,7 +41,7 @@ export function useKejadian(options?: UseKejadianOptions) {
 				}
 			})
 			.finally(() => setLoading(false));
-	}, []);
+	}, [limit]);
 
 	const fetchSearch = useCallback((query: string, signal?: AbortSignal) => {
 		setLoading(true);

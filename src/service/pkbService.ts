@@ -9,6 +9,7 @@ import { apiFetch } from "./api";
 export const getPKB = async (params: PKBQueryParams, signal: AbortSignal) => {
 	const query = new URLSearchParams();
 	if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("per_page", String(params.limit))
 	return await apiFetch<PKBListResponse>(`/pkb?${query.toString()}`, { signal });
 };
 

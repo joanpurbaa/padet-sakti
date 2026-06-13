@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useKelahiran } from "../../hooks/useKelahiran";
 import type { Kelahiran as KelahiranType } from "../../types/Kelahiran";
+import { useState } from "react";
 
 const COLUMNS = [
 	{ key: "no", label: "#", align: "center" as const },
@@ -21,6 +22,8 @@ const COLUMNS = [
 ];
 
 export default function Kelahiran() {
+	const [limit, setLimit] = useState(10);
+
 	const {
 		kelahiranList,
 		loading,
@@ -32,7 +35,7 @@ export default function Kelahiran() {
 		from,
 		to,
 		refetch,
-	} = useKelahiran();
+	} = useKelahiran({ limit });
 
 	const paginationPages = buildPaginationPages(page, totalPages);
 
@@ -46,12 +49,30 @@ export default function Kelahiran() {
 			<div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 					<div className="flex items-center gap-3">
-						<button
-							onClick={refetch}
-							disabled={loading}
-							className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 disabled:opacity-40 transition-colors cursor-pointer">
-							<RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-						</button>
+						<div className="flex items-center gap-2 text-sm text-gray-500">
+							<select
+								value={limit}
+								onChange={(e) => {
+									setPage(1);
+									setLimit(Number(e.target.value));
+								}}
+								className="border border-gray-200 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+								{[5, 10, 25, 50, 100].map((num) => (
+									<option key={num} value={num}>
+										{num}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className="flex items-center gap-3">
+							<button
+								onClick={refetch}
+								disabled={loading}
+								className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 disabled:opacity-40 transition-colors cursor-pointer">
+								<RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+							</button>
+						</div>
 					</div>
 				</div>
 
